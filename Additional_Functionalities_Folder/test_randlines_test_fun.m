@@ -21,15 +21,15 @@ function test_randlines_test_fun(testimage)
         xp2 = xsize;
         yp2 = ysize-yp1;
         testimage = bresenhamLine(testimage,[yp1,xp1],[yp2,xp2],200);
-
-
+        
+        % put some noises on image
         testimage = imnoise(testimage, 'salt & pepper');
 
         corr = correlation_line(testimage,angrange,transrange,sigma);
+   
     end
     
-    
-
+        
     Data_Visualization_Fun(corr);
 
 end
