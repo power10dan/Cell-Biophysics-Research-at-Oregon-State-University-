@@ -41,6 +41,10 @@ function best_point_interp = parse_contour_data(peak_coord)
     
         x_cord = peak_coord(cord_counter);
         y_cord = peak_coord(cord_counter+1);
+        % figure out smallest intensity, then take the coordinate of
+        % smallest intensity and construct a polygon using inpoly. average
+        % other coordinates and check if the other coordinates is within
+        % the polygon. Then, they belong to the same contour peak. 
         
         %average the sum
         ave_x = sum(x_cord) / numel(x_cord);
@@ -62,32 +66,43 @@ function best_point_interp = parse_contour_data(peak_coord)
 end
 
 function peaks_found = find_peaks(intensity_cord_and_data,contour_matrix)
-    
+ 
     intensity_values = zeros(numel(intensity_cord_and_data),1);
-    
-    for idx = 1:numel(intensity_cord_and_data)
-        
-        intensity_values(idx) = intensity_cord_and_data(idx).region_intensity;
-        
-    end
-          
     refine_contour = 0;
+    counter_peak = 0;
     
-    % loop through struct and draw more refined contours if needed 
+    
+    intensity_cord_and_data.region_intensity
+    intensity_cord_and_data.average_coordinate_x
+    intensity_cord_and_data.average_coordinate_y
+    return;
+  
+    idx_extract_intensity = 1:numel(intensity_cord_and_data);
+        
+    intensity_values(idx_extract_intensity) = intensity_cord_and_data(idx_extract_intensity).region_intensity;
+    
+    origin = intensity_values(1);
+    
+    % loop through struct and draw more refined contours for each of the
+    % separate polygon mountains to find a more refined peak
    
     for idx = 1:numel(intensity_values)
      
-        origin = intensity_values(1);
-
-        if (abs(intensity_values(idx)- origin) > 0.1)
- 
-            refine_contour = contour(contour_matrix, [origin:0.01:intensity_values(idx)]);
-          
+        if (abs(intensity_values(idx)- origin) == 0.1)
+        
+            refine_contour = contour(contour_matrix,...
+                                            [origin+0.01:0.01:intensity_values(idx)]);
+      
+        else 
+            
+            counter_peak = counter_peak + 1;                         
+                                        
+                                        
         end
    
     end
     
-    disp(refine_contour)
+    disp(refine_contour);
     peaks_found = 0;
 
 
