@@ -65,60 +65,47 @@ function grouped_array = find_max_fun(intensity_struct_data)
     
     min_intensity = min([intensity_struct_data(:).region_intensity]);
     min_intensity_location = find([intensity_struct_data(:).region_intensity]...
-                                                         == min_intensity);
+                                                         == min_intensity); 
+                                                    
+    intensity_struct_data(:).region_intensity 
   
-    %boundary case when there is only 1 minimum intensity value but more
-    %than one peaks
-    intensity_struct_data(:).region_intensity
-    
-    if numel(min_intensity_location) == 1
-       
-        min_intensity = intensity_struct_data(1:2).region_intensity;
-        min_intensity_location_1 = find([intensity_struct_data(:).region_intensity] == min_intensity(1));
-        min_intensity_location_2 = find([intensity_struct_data(:).region_intensity]...
-                                                         == min_intensity(2));
-                                                     
-        min_intensity_location = [min_intensity_location_1 min_intensity_location_2];                                            
-
-    end
-    
-    
-    intensities_coordinates = [intensity_struct_data(:).average_coordinate_x; ...
-                               intensity_struct_data(:).average_coordinate_y];
-    
-    intensities_coordinates = transpose(intensities_coordinates);
-
+    peak_diff_tolerance = 3;
+ 
     min_intensity_group = cell(numel(intensity_struct_data), numel(min_intensity_location));
 
-    intensities_x = intensities_coordinates(:,1)
-    intensities_y = intensities_coordinates(:,2)
-   
-    combos_x = nchoosek([intensities_x],(2));
-    
-    combos_y = nchoosek([intensities_y],(2));
-    
-    combos = [combos_x combos_y]
-    
-%     for idx = 1:numel(combos)
-%        
-%         %subtract intensities from 2 columns
-%         
-%         
-%         
-%         
-%         
-%         
-%     end
-%     
-    
-    
-
-       
-       
+    for idx = 1:numel(min_intensity_location)
+        
+        min_intensity_group{1,idx} = intensity_struct_data(idx);
+        
+        for idx_2 = numel(min_intensity_location)+1:numel(intensity_struct_data)
+           
+            peak_threshold_min_x = min_intensity_group{1,idx}.x_coord(1);
+            peak_threshold_min_y = min_intensity_group{1,idx}.y_coord(1);
+           
+            
+            if intensity_struct_data(idx_2).x_coord(1) - peak_threshold_min_x < peak_diff_tolerance ...
+                              
+                if intensity_struct_data(idx_2).y_coord(1) - peak_threshold_min_y < 1
+                    
+                    min_intensity_group{idx_2,idx} = intensity_struct_data(idx_2);
+                
+                end
   
+            end
+       
+        end
+      
+    end
     
-   
-   
+    % continue finding threshhold of everything and suitable differences
+    min_intensity_group
+    z1 = min_intensity_group(:,1)
+    z1{:}
+    z2 = min_intensity_group(:,2)
+    z2{:}
+    z3 = min_intensity_group(:,3)
+    z3{:}
+
     return;
     grouped_array = min_intensity_information;
   
