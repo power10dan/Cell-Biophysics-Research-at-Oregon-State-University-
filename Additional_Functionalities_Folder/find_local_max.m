@@ -69,26 +69,30 @@ function grouped_array = find_max_fun(intensity_struct_data)
                                                     
     intensity_struct_data(:).region_intensity 
   
-    peak_diff_tolerance = 3;
+    peak_diff_tolerance = 5;
  
     min_intensity_group = cell(numel(intensity_struct_data), numel(min_intensity_location));
-
+    
     for idx = 1:numel(min_intensity_location)
         
         min_intensity_group{1,idx} = intensity_struct_data(idx);
         
-        for idx_2 = numel(min_intensity_location)+1:numel(intensity_struct_data)
-           
+        for idx_2 = min_intensity_location(end)+1: numel(intensity_struct_data)
+             
             peak_threshold_min_x = min_intensity_group{1,idx}.x_coord(1);
             peak_threshold_min_y = min_intensity_group{1,idx}.y_coord(1);
-           
-            
-            if intensity_struct_data(idx_2).x_coord(1) - peak_threshold_min_x < peak_diff_tolerance ...
+                       
+            if (abs(intensity_struct_data(idx_2).x_coord(1) - peak_threshold_min_x)) < peak_diff_tolerance 
                               
-                if intensity_struct_data(idx_2).y_coord(1) - peak_threshold_min_y < 1
-                    
+                if (abs(intensity_struct_data(idx_2).y_coord(1) - peak_threshold_min_y)) < peak_diff_tolerance
+                   
                     min_intensity_group{idx_2,idx} = intensity_struct_data(idx_2);
-                
+                    
+                  
+                else
+                    
+                    continue;
+                                        
                 end
   
             end
@@ -97,14 +101,24 @@ function grouped_array = find_max_fun(intensity_struct_data)
       
     end
     
-    % continue finding threshhold of everything and suitable differences
-    min_intensity_group
-    z1 = min_intensity_group(:,1)
-    z1{:}
-    z2 = min_intensity_group(:,2)
-    z2{:}
-    z3 = min_intensity_group(:,3)
-    z3{:}
+    %clean up empty cells 
+    min_intensity_group = min_intensity_group(~cellfun(@isempty,min_intensity_group));
+
+    min_intensity_group{:}
+    difference_number = numel(intensity_struct_data) - numel(min_intensity_group);
+    
+    if difference_number > 1 
+        
+        
+    
+    
+    
+    
+    
+    end    
+    
+    
+
 
     return;
     grouped_array = min_intensity_information;
