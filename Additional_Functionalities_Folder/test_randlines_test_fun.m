@@ -9,7 +9,7 @@ function test_randlines_test_fun(testimage)
     halfdiaglen = floor(sqrt(xsize^2+ysize^2)/2);
 
 
-    for idx = 1:3
+    for idx = 1:5
         transrange = [-halfdiaglen,1,halfdiaglen];
 
         imgsize = size(testimage);
