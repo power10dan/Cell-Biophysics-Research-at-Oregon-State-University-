@@ -80,13 +80,13 @@ function grouped_array = find_max_fun(intensity_struct_data)
 
         for idx_2 = num_max_intensity_struct : -1: numel(min_intensity_location)+1
              
-            peak_threshold_min_x = min_intensity_group{1,idx}.x_coord(1);
-            peak_threshold_min_y = min_intensity_group{1,idx}.y_coord(1);
+            peak_threshold_min_x = min_intensity_group{1,idx}.average_coordinate_x(1);
+            peak_threshold_min_y = min_intensity_group{1,idx}.average_coordinate_y(1);
                        
-            if (abs(intensity_struct_data(idx_2).x_coord(1) - peak_threshold_min_x)) ...
+            if (abs(intensity_struct_data(idx_2).average_coordinate_x(1) - peak_threshold_min_x)) ...
                                                         < peak_diff_tolerance 
                               
-                if (abs(intensity_struct_data(idx_2).y_coord(1) - peak_threshold_min_y)) ...
+                if (abs(intensity_struct_data(idx_2).average_coordinate_y(1) - peak_threshold_min_y)) ...
                                                         < peak_diff_tolerance
                     emptyCells = cellfun(@isempty,min_intensity_group(:,idx));
                     
@@ -106,34 +106,35 @@ function grouped_array = find_max_fun(intensity_struct_data)
             end
        
         end
-      
+   
     end
-    
-    
+ 
     %clean up empty cells 
     min_intensity_group = min_intensity_group(~cellfun(@isempty,min_intensity_group));
-     
-    % clean up min intensity used before (due tomorrow)
-    
-
+    intensity_struct_data(min_intensity_location) = [];
     
     min_intensity_group{:}
-    difference_number = numel(intensity_struct_data) - numel(min_intensity_group);
+
+    disp('this is intensity')
+    intensity_struct_data
     
     return;
-    if difference_number > 1 
+    if numel(intensity_struct_data) > 1
         
+        disp('This is extra data');
         
-    
-    
-    
-    
-    
+        for idx = 1:numel(intensity_struct_data)
+            
+           additional_array{idx,1} = intensity_struct_data(idx); 
+      
+        end    
+        
+        min_intensity_group = vertcat(min_intensity_group, additional_array);
+        
+        min_intensity_group{:}
+  
     end    
-    
-    
-
-
+  
     return;
     grouped_array = min_intensity_information;
   
