@@ -9,7 +9,7 @@ function test_randlines_test_fun(testimage)
     halfdiaglen = floor(sqrt(xsize^2+ysize^2)/2);
 
    
-    for idx = 1:5
+    for idx = 1:10
         transrange = [-halfdiaglen,1,halfdiaglen];
 
         imgsize = size(testimage);
@@ -24,7 +24,7 @@ function test_randlines_test_fun(testimage)
         testimage = bresenhamLine(testimage,[yp1,xp1],[yp2,xp2],200);
         
         % put some noises on image
-        %testimage = imnoise(testimage, 'salt & pepper');
+        testimage = imnoise(testimage, 'salt & pepper');
 
         corr = correlation_line(testimage,angrange,transrange,sigma);
    

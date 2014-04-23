@@ -56,58 +56,52 @@ function best_point_interp = Parse_Contour_Data(peak_coord, contour_matrix)
     %find minimum
     groups = Find_Max_Fun(intensity_data);
     count_intensity(groups);
-    return;
-    refine_contour = contour_refine(groups, intensity_data, contour_matrix);
+%     return;
+%     refine_contour = contour_refine(groups, intensity_data, contour_matrix);
     
 
 end
 
 function grouped_array = Find_Max_Fun(intensity_struct_data)
     
-    min_intensity = min([intensity_struct_data(:).region_intensity]);
-    min_intensity_location = find([intensity_struct_data(:).region_intensity]...
-                                                         == min_intensity); 
-                                                     
-    intensity_struct_data(:).region_intensity 
-  
-    peak_diff_tolerance = 2;
+    size_struct_data = numel(intensity_struct_data);
+    [min_intensity_group, new_intensity_struct_data] = Group_calc(intensity_struct_data, size_struct_data)
     
-  
-    min_intensity_group = cell(numel(intensity_struct_data), numel(min_intensity_location));
- 
-    [min_intensity_group, new_intensity_struct_data] = Group_calc(min_intensity_group, min_intensity_location, ...
-                                                                  intensity_struct_data, peak_diff_tolerance);
-   
-    if numel(new_intensity_struct_data) > 1
+    out_lier_data = 0;   
         
-        disp('This is extra data');
-        sz = size(min_intensity_group);
+    if numel(new_intensity_struct_data) > 0
          
-        additional_array = cell(sz(1),1); % keep dimension consistant for concatination 
+        [intensity_group_additional, new_intensity_struct_data] = Group_calc(new_intensity_struct_data, size_struct_data);
+          
+        min_intensity_group = [min_intensity_group intensity_group_additional];
         
-        for idx = 1:numel(new_intensity_struct_data)
+        if numel(new_intensity_struct_data) > 0
+            disp('Outliers')
+            new_intensity_struct_data(:).region_intensity
+            out_lier_data = numel(new_intensity_struct_data);
             
-            additiona_array{idx,1} = new_intensity_struct_data(idx);
-            
-            
-            
-        end
-   
+     
+        end        
         
-        min_intensity_group = [min_intensity_group additional_array];     
-       
-  
-    end 
-    
-    min_intensity_group(all(cellfun(@isempty,min_intensity_group),2), : ) = []
-    count_intensity(min_intensity_group);
+    end
+        
+    min_intensity_group(all(cellfun(@isempty,min_intensity_group),2), : ) = [];
+    % off by one, but that's OK, fix tomorrow// 
+    min_intensity_group{:}
+    count_intensity(out_lier_data, min_intensity_group);
   
   
 end
 
-function [min_intensity_data, new_intensity_struct_data] = Group_calc(min_intensity_group_array, ...
-                                                                      min_intensity_location_array, ...
-                                                                      intensity_data_struct, peak_diff)
+function [min_intensity_data, new_intensity_struct_data] = Group_calc(intensity_data_struct, size_struct_data)
+                                                                  
+    min_intensity = min([intensity_data_struct(:).region_intensity]);
+    min_intensity_location_array = find([intensity_data_struct(:).region_intensity]...
+                                                         == min_intensity); 
+
+    peak_diff= 3;
+  
+    min_intensity_group_array = cell(size_struct_data, numel(min_intensity_location_array));                                                              
     num_max_intensity_struct = numel(intensity_data_struct);
     
     for idx = 1:numel(min_intensity_location_array)
@@ -147,7 +141,7 @@ function [min_intensity_data, new_intensity_struct_data] = Group_calc(min_intens
     end
     
     intensity_data_struct(min_intensity_location_array) = [];
-    new_intensity_struct_data = intensity_data_struct
+    new_intensity_struct_data = intensity_data_struct;
     
     min_intensity_data = min_intensity_group_array;
     
@@ -155,20 +149,17 @@ end
   
 
 
-function count_intensity(intensity_array)
+function count_intensity(out_lier_data, intensity_array)
 
-     intensity_array{:}
      sz_intensity_array = size(intensity_array);
-     
-     num_peaks = sz_intensity_array(2)
-          
-     
+ 
+     num_peaks = sz_intensity_array(2)+out_lier_data;
 
-
-
+     fprintf('There are %d peaks between your 0.6 and 1\n', num_peaks);
+  
 end
 
-
+% make new canvas all the time!
 
 
 % function refine_contour = contour_refine(grouped_intensity_array, intensity_cord_and_data,contour_matrix)
