@@ -1,4 +1,4 @@
-% function Peak_Finding(correlation_map)  
+% function Peak_Finding(correlation_map, user_low, user_high, testimage)
 % 
 % Description:
 %        
@@ -8,22 +8,23 @@
 %   
 % Initial conditions:
 % 
-% correlation_map must be generated from the
-% correlation_line function, low and high threshold must be either decimal
-% or integer values between 0 and 1. 
+% correlation_map must be generated from the correlation_line function 
+%
+% user_low and user_high are variable representing the range of intensiy of the
+% lines the user wants to find. They must be decimal values between 0 and 1. 
 %   
 % Final conditions: None 
 %
 
-function Peak_Finding(correlation_map)
- 
-    user_input_low = 0.5;
-    user_input_high = 1.0;
-   
+function Peak_Finding(correlation_map, user_low, user_high, testimage)
+
+    % boundaries to obtain all intensities within the contour matrix
+    max_intensity = 1.0;
+    
     C = contour(correlation_map);
 
     % find the indices of peaks within this region 
-    peak_region_idx = find(C > user_input_low & C < user_input_high); 
+    peak_region_idx = find(C > user_low & C < max_intensity); % user_input_low < intensity <= max_intensity
  
     % extract peaks and their x and y coordinates
     peaks_and_coord = C(peak_region_idx(1):end);
@@ -34,7 +35,7 @@ function Peak_Finding(correlation_map)
     % group and determine outliers. 
     [outliers, grouped_array_data] = Find_Max_Fun(parsed_contour_data);
     %count intensities and plot them 
-    count_intensity(outliers, grouped_array_data);
+    Count_Intensity_And_Export_Figure(outliers, grouped_array_data, user_low,user_high, testimage);
   
 end
 % function parsed_data = Peak_Contour_Data(peak_coord, contour_matrix)
@@ -57,10 +58,10 @@ end
 
 function parsed_data = Parse_Contour_Data(peak_coord)
     
-    % variables
+    % variable initialization 
     intensity_data = struct();
 
-    %indices
+    % indices 
     idx = 2;
     struct_idx = 1;
     peak_intensity_idx = 1;
@@ -68,8 +69,8 @@ function parsed_data = Parse_Contour_Data(peak_coord)
     while idx < numel(peak_coord)
   
         peak_intensity = peak_coord(1,peak_intensity_idx);
-        peak_init_height = peak_coord(1,idx);
-        cord_counter = idx+1:2:(2*peak_init_height)+idx;
+        num_of_x_y_cord_pairs_at_peak_intensity = peak_coord(1,idx);
+        cord_counter = idx+1:2:(2*num_of_x_y_cord_pairs_at_peak_intensity)+idx;
     
         x_cord = peak_coord(cord_counter);
         y_cord = peak_coord(cord_counter+1);
@@ -86,8 +87,8 @@ function parsed_data = Parse_Contour_Data(peak_coord)
         intensity_data(struct_idx).y_coord = y_cord;
       
         struct_idx = struct_idx + 1;
-        peak_intensity_idx = (2*peak_init_height)+idx + 1;
-        idx = (2*peak_init_height)+idx + 2;
+        peak_intensity_idx = (2*num_of_x_y_cord_pairs_at_peak_intensity)+idx + 1;
+        idx = (2*num_of_x_y_cord_pairs_at_peak_intensity)+idx + 2;
     
     end
    
@@ -117,32 +118,22 @@ end
 
 function [outliers, intensity_array] = Find_Max_Fun(intensity_struct_data)
     
-    out_lier_data = 0;   
     size_struct_data = numel(intensity_struct_data);
-    [min_intensity_group, new_intensity_struct_data] = Group_calc(intensity_struct_data, size_struct_data);
+    [min_intensity_group, new_intensity_struct_data] = Group_calc(intensity_struct_data, size_struct_data); 
     
-    if numel(new_intensity_struct_data) > 0
+    if numel(new_intensity_struct_data) > 0 % do it again if there are intensities that are not grouped
          
         [intensity_group_additional, new_intensity_struct_data] = Group_calc(new_intensity_struct_data, size_struct_data);
           
         min_intensity_group = [min_intensity_group intensity_group_additional];
-        
-        if numel(new_intensity_struct_data) > 0
-            disp('Outliers')
-            new_intensity_struct_data(:).region_intensity
-            out_lier_data = numel(new_intensity_struct_data);
-            
-     
-        end        
-        
+ 
     end
         
-    min_intensity_group(all(cellfun(@isempty,min_intensity_group),2), : ) = [];
+    min_intensity_group(all(cellfun(@isempty,min_intensity_group),2), : ) = []; % clean empty cell arrays
     outliers = new_intensity_struct_data;
     intensity_array = min_intensity_group;
    
-  
-end
+ end
 % function [min_intensity_data, new_intensity_struct_data] = Group_calc(intensity_data_struct, size_struct_data)
 % 
 % Description:
@@ -170,31 +161,31 @@ function [min_intensity_data, new_intensity_struct_data] = Group_calc(intensity_
     min_intensity = min([intensity_data_struct(:).region_intensity]);
     min_intensity_location_array = find([intensity_data_struct(:).region_intensity]...
                                                          == min_intensity); 
-
-    peak_diff= 3;
+    
+    peak_diff= 3; % peak_diff tells the program how far apart a line must be to be considered a single line or two separate lines
   
-    min_intensity_group_array = cell(size_struct_data, numel(min_intensity_location_array));                                                              
+    intensity_group_array = cell(size_struct_data, numel(min_intensity_location_array));                                                              
     num_max_intensity_struct = numel(intensity_data_struct);
     
     for idx = 1:numel(min_intensity_location_array)
    
-        min_intensity_group_array{1,idx} = intensity_data_struct(min_intensity_location_array(idx));
+        intensity_group_array{1,idx} = intensity_data_struct(min_intensity_location_array(idx));
 
         for idx_2 = num_max_intensity_struct : -1: numel(min_intensity_location_array)+1
 
-            peak_threshold_min_x = min_intensity_group_array{1,idx}.average_coordinate_x(1);
-            peak_threshold_min_y = min_intensity_group_array{1,idx}.average_coordinate_y(1);
+            peak_threshold_min_x = intensity_group_array{1,idx}.average_coordinate_x(1);
+            peak_threshold_min_y = intensity_group_array{1,idx}.average_coordinate_y(1);
 
             if (abs(intensity_data_struct(idx_2).average_coordinate_x(1) - peak_threshold_min_x)) ...
                     < peak_diff
 
                 if (abs(intensity_data_struct(idx_2).average_coordinate_y(1) - peak_threshold_min_y)) ...
                         < peak_diff
-                    emptyCells = cellfun(@isempty,min_intensity_group_array(:,idx));
+                    emptyCells = cellfun(@isempty,intensity_group_array(:,idx));
 
-                    empty_cell_idx = find(emptyCells == 1);
+                    empty_cell_idx = find(emptyCells == 1); % find the first empty cell and put data there, for data organization purposes
 
-                    min_intensity_group_array{empty_cell_idx(end),idx} = intensity_data_struct(idx_2);
+                    intensity_group_array{empty_cell_idx(end),idx} = intensity_data_struct(idx_2);
 
                     intensity_data_struct(idx_2) = [];
                     num_max_intensity_struct = num_max_intensity_struct - 1;
@@ -215,11 +206,11 @@ function [min_intensity_data, new_intensity_struct_data] = Group_calc(intensity_
     intensity_data_struct(min_intensity_location_array) = [];
     new_intensity_struct_data = intensity_data_struct;
     
-    min_intensity_data = min_intensity_group_array;
+    min_intensity_data = intensity_group_array;
     
 end
 
-% function count_intensity(out_lier_data, intensity_array)
+% function Count_Intensity_And_Export_Figure(out_lier,intensity_array, low_intensity, high_intensity, testimage)
 % 
 % Description:
 %        
@@ -230,21 +221,25 @@ end
 %   
 % Initial conditions: 
 %
-% out_lier_data must be an integer, and intensity_array must be an array of
+% out_lier_data must be an integer
+
+%  intensity_array must be an array of
 % integers that represents the grouped intensities.
+% 
+% low_intensity and high_intensity must be of decimal values between 0 and
+% 1. 
+% Testimage must be a matrix with lines generated from the correlation
+% funtion. 
 %     
 % Final conditions: None  
 
 
-function count_intensity(out_lier,intensity_array)
-
+function Count_Intensity_And_Export_Figure(out_lier,intensity_array, low_intensity, high_intensity, testimage)
+     
      sz_intensity_array = size(intensity_array);
      sz_outlier = size(out_lier);
-   
-     num_peaks = sz_intensity_array(2)+ numel(out_lier);
+     count_markers = 0;   
      num_outliers = sz_outlier(2);
-          
-     fprintf('There are %d peaks between your 0.6 and 1\n', num_peaks);
     
      % go through each column and locate the intensities
      for idx = 1:sz_intensity_array(2)
@@ -254,29 +249,41 @@ function count_intensity(out_lier,intensity_array)
          
          % if there is only one element in the column, then that means that
          % the only element is the peak
-         if numel(non_empty_idx) == 1
-       
-             x_cord = intensity_array{non_empty_idx,idx}.average_coordinate_x;
-             y_cord =intensity_array{non_empty_idx,idx}.average_coordinate_y;
-       
-             plot(x_cord,y_cord,'+','LineWidth',2,'MarkerSize',10,'MarkerEdgeColor','b','MarkerFaceColor',[0.5,0.5,0.5]);
-             % Label the points with the corresponding 'x' value
-             labelstr = sprintf(' %.2f,%.2f ', x_cord, y_cord);
-             text(x_cord,y_cord, labelstr, 'VerticalAlignment', 'bottom');
+         if numel(non_empty_idx) == 1 
+             
+             if(intensity_array{non_empty_idx,idx}.region_intensity >= low_intensity && ...
+                   intensity_array{non_empty_idx,idx}.region_intensity <= high_intensity)  % if the intensity is between user interest, then plot it, else don't plot it
+                 
+               x_cord = intensity_array{non_empty_idx,idx}.average_coordinate_x;
+               y_cord = intensity_array{non_empty_idx,idx}.average_coordinate_y;
+               intensity = intensity_array{non_empty_idx, idx}.region_intensity;
+               
+               plot(x_cord,y_cord,'+','LineWidth',2,'MarkerSize',10,'MarkerEdgeColor','b','MarkerFaceColor',[0.5,0.5,0.5]);
+               % Label the points with the corresponding 'x' value
+               labelstr = sprintf('%.2f, %.2f, %1.2f', x_cord, y_cord, intensity);
+               text(x_cord,y_cord, labelstr, 'HorizontalAlignment', 'right','FontWeight', 'bold','BackgroundColor',[.7 .9 .7]);
+               count_markers = count_markers + 1;
+             end
              
          else
-         
-             % if there are more elements, then the max intensity is at the
-             % last position of the column
-             x_cord = intensity_array{non_empty_idx(end), idx}.average_coordinate_x;
-             y_cord = intensity_array{non_empty_idx(end), idx}.average_coordinate_y;
              
-             hold on
-             plot(x_cord,y_cord,'+','LineWidth',2,'MarkerSize',10,'MarkerEdgeColor','b','MarkerFaceColor',[0.5,0.5,0.5]);
-             % Label the points with the corresponding 'x' value
-             labelstr = sprintf(' %.2f,%.2f ', x_cord, y_cord);
-             text(x_cord,y_cord, labelstr, 'VerticalAlignment', 'bottom');
-
+             if(intensity_array{non_empty_idx(end),idx}.region_intensity >= low_intensity && ...
+                   intensity_array{non_empty_idx(end),idx}.region_intensity <= high_intensity)  
+             
+               % if there are more elements, then the max intensity is at the
+               % last position of the column
+               x_cord = intensity_array{non_empty_idx(end), idx}.average_coordinate_x;
+               y_cord = intensity_array{non_empty_idx(end), idx}.average_coordinate_y;
+               intensity = intensity_array{non_empty_idx(end), idx}.region_intensity;
+               hold on
+               plot(x_cord,y_cord,'+','LineWidth',2,'MarkerSize',10,'MarkerEdgeColor','b','MarkerFaceColor',[0.5,0.5,0.5]);
+               % Label the points with the corresponding 'x' value
+               labelstr = sprintf('%.2f, %.2f, %1.2f', x_cord, y_cord, intensity);
+               text(x_cord,y_cord, labelstr, 'HorizontalAlignment', 'right','FontWeight', 'bold','BackgroundColor',[.7 .9 .7]);
+          
+               
+               count_markers = count_markers + 1;
+             end
         
          end
 
@@ -288,19 +295,40 @@ function count_intensity(out_lier,intensity_array)
          for idx_2 = 1:sz_outlier(1)
              
              hold on;
-             x_cord = out_lier(idx_2, idx).average_coordinate_x;
-             y_cord = out_lier(idx_2, idx).average_coordinate_y;
-             
-             plot(x_cord,y_cord,'+','LineWidth',2,'MarkerSize',10,'MarkerEdgeColor','b','MarkerFaceColor',[0.5,0.5,0.5]);
-             % Label the points with the corresponding 'x' value
-             labelstr = sprintf(' %.2f,%.2f ', x_cord, y_cord);
-             text(x_cord,y_cord, labelstr, 'VerticalAlignment', 'bottom');
+            
+             if(out_lier(idx_2, idx).region_intensity >= low_intensity && ...
+                   out_lier(idx_2, idx).region_intensity <= high_intensity)  
+               
+                 x_cord = out_lier(idx_2, idx).average_coordinate_x;
+                 y_cord = out_lier(idx_2, idx).average_coordinate_y;
+                 intensity_outlier = out_lier(idx_2, idx).region_intensity;
+                 
+                 plot(x_cord,y_cord,'+','LineWidth',2,'MarkerSize',10,'MarkerEdgeColor','b','MarkerFaceColor',[0.5,0.5,0.5]);
+                 % Label the points with the corresponding 'x' value
+                 labelstr = sprintf('%.2f, %.2f, %1.2f', x_cord, y_cord, intensity_outlier);
+                 text(x_cord,y_cord, labelstr, 'HorizontalAlignment', 'right', 'FontWeight', 'bold','BackgroundColor',[.7 .9 .7]);
+                 count_markers = count_markers + 1;
+             end
              
          end
     
      end     
-     hold off
      
-  
+     fprintf('There are %d peaks that are greater %f and smaller than %f by a decimal precision of 0.1\n', count_markers, low_intensity, high_intensity);
+ 
+     hold off
+ 
 end
+
+
+
+
+
+
+
+
+
+
+
+
 

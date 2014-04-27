@@ -22,11 +22,10 @@ for i=1:nhlines
     yp2 = ysize-yp1;
     testimage = bresenhamLine(testimage,[yp1,xp1],[yp2,xp2],200);
     sprintf('processing line number: %d',lineind)
-    
+    testimage = imnoise(testimage, 'salt & pepper', 0.1);
 
-    testimage = imnoise(testimage, 'salt & pepper', 0.03);
     corr = correlation_line(testimage,angrange,transrange,sigma);
-    Intensities_Normalization_Fun(corr);
+    Intensities_Normalization_Fun(corr, testimage);
     
     filename = [sprintf('testline_%04d',lineind),'.png'];
     figure,100;
@@ -48,10 +47,10 @@ for i=1:nvlines
     xp2 = xsize-xp1;
     testimage = bresenhamLine(testimage,[yp1,xp1],[yp2,xp2],200);
     sprintf('processing line number: %d',lineind)
-  
-    testimage = imnoise(testimage, 'salt & pepper', 0.03);
+    testimage = imnoise(testimage, 'salt & pepper', 0.1);
+
     corr = correlation_line(testimage,angrange,transrange,sigma);
-    Intensities_Normalization_Fun(corr);
+    Intensities_Normalization_Fun(corr, testimage);
     
     filename = [sprintf('testline_%04d',lineind),'.png'];
     figure,100;
@@ -59,7 +58,6 @@ for i=1:nvlines
     imagesc(testimage);
     subplot(2,1,2);
     imcontour([-halfdiaglen,halfdiaglen],[0,179],corr);
-    imagesc(corr);
     set(gcf,'Position',[100,100,600,900]);
 
     export_fig([outputfolder,filesep,filename],'-png');
@@ -74,10 +72,10 @@ for i=1:nplines
     xp2 = xp1;
     testimage = bresenhamLine(testimage,[yp1,xp1],[yp2,xp2],200);
     sprintf('processing line number: %d',lineind)
+    testimage = imnoise(testimage, 'salt & pepper', 0.1);
 
-    testimage = imnoise(testimage, 'salt & pepper',0.03);
     corr = correlation_line(testimage,angrange,transrange,sigma);
-    Intensities_Normalization_Fun(corr);
+    Intensities_Normalization_Fun(corr, testimage);
     
     filename = [sprintf('testline_%04d',lineind),'.png'];
     figure,100;
@@ -85,7 +83,6 @@ for i=1:nplines
     imagesc(testimage);
     subplot(2,1,2);
     imcontour([-halfdiaglen,halfdiaglen],[0,179],corr);
-    imagesc(corr);
     set(gcf,'Position',[100,100,600,900]);
 
     export_fig([outputfolder,filesep,filename],'-png');
