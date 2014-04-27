@@ -21,24 +21,8 @@ for i=1:nhlines
     xp2 = xsize;
     yp2 = ysize-yp1;
     testimage = bresenhamLine(testimage,[yp1,xp1],[yp2,xp2],200);
-    sprintf('processing line number: %d',lineind)
-    testimage = imnoise(testimage, 'salt & pepper', 0.1);
-
-    corr = correlation_line(testimage,angrange,transrange,sigma);
-    Intensities_Normalization_Fun(corr, testimage);
-    
-    filename = [sprintf('testline_%04d',lineind),'.png'];
-    figure,100;
-    subplot(2,1,1);
-    imagesc(testimage);
-    subplot(2,1,2);
-    imcontour([-halfdiaglen,halfdiaglen],[0,179],corr);
-    set(gcf,'Position',[100,100,600,900]);
-    export_fig([outputfolder,filesep,filename],'-png');
-    close,100;
     lineind = lineind+1;
 end
- 
 
 for i=1:nvlines
     yp1 = 1;
@@ -46,22 +30,6 @@ for i=1:nvlines
     yp2 = ysize;
     xp2 = xsize-xp1;
     testimage = bresenhamLine(testimage,[yp1,xp1],[yp2,xp2],200);
-    sprintf('processing line number: %d',lineind)
-    testimage = imnoise(testimage, 'salt & pepper', 0.1);
-
-    corr = correlation_line(testimage,angrange,transrange,sigma);
-    Intensities_Normalization_Fun(corr, testimage);
-    
-    filename = [sprintf('testline_%04d',lineind),'.png'];
-    figure,100;
-    subplot(2,1,1);
-    imagesc(testimage);
-    subplot(2,1,2);
-    imcontour([-halfdiaglen,halfdiaglen],[0,179],corr);
-    set(gcf,'Position',[100,100,600,900]);
-
-    export_fig([outputfolder,filesep,filename],'-png');
-    close,100;
     lineind = lineind+1;
 end
 
@@ -71,25 +39,24 @@ for i=1:nplines
     yp2 = ysize;
     xp2 = xp1;
     testimage = bresenhamLine(testimage,[yp1,xp1],[yp2,xp2],200);
-    sprintf('processing line number: %d',lineind)
-    testimage = imnoise(testimage, 'salt & pepper', 0.1);
-
-    corr = correlation_line(testimage,angrange,transrange,sigma);
-    Intensities_Normalization_Fun(corr, testimage);
-    
-    filename = [sprintf('testline_%04d',lineind),'.png'];
-    figure,100;
-    subplot(2,1,1);
-    imagesc(testimage);
-    subplot(2,1,2);
-    imcontour([-halfdiaglen,halfdiaglen],[0,179],corr);
-    set(gcf,'Position',[100,100,600,900]);
-
-    export_fig([outputfolder,filesep,filename],'-png');
-    close,100;
     lineind = lineind+1;
 
 end
-    
+total_lines = nplines+nvlines+nhlines;
+
+sprintf('Total number of lines: %d', total_lines)
+
+testimage = imnoise(testimage, 'speckle', 0.15);
+
+corr = correlation_line(testimage,angrange,transrange,sigma);
+Intensities_Normalization_Fun(corr);
+figure, imagesc(testimage);
+title('Raw Image with Speckle Artificial Noise with Variance of 0.15','FontSize', 14, 'FontWeight', 'bold');
+
+label_string_x = 'Translation (pixels)';
+label_string_y = 'Angle (Degrees)';
+
+xlabel(label_string_x, 'FontSize', 12, 'FontWeight', 'bold');
+ylabel(label_string_y,'FontSize', 12, 'FontWeight', 'bold');
 
 end     
