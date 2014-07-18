@@ -18,7 +18,7 @@
 % Final conditions: None 
 %
 
-function Intensities_Normalization_Fun(correlation_map, testimage)
+function [Outlier_array, group_intense_array] =Intensities_Normalization_Fun(correlation_map)
     
     % normalize the correlation map 
     high_value = max(correlation_map(:));
@@ -29,7 +29,6 @@ function Intensities_Normalization_Fun(correlation_map, testimage)
     
     user_input_low = 0.6;
     user_input_high = 1;
-   
-    Peak_Finding(correlation_map, user_input_low, user_input_high, testimage);
+    [Outlier_array, group_intense_array] = Peak_Finding(correlation_map, user_input_low, user_input_high);
 end
    

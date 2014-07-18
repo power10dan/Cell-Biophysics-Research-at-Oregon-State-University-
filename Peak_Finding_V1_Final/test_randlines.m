@@ -7,6 +7,7 @@ xsize = imgsize(2);
 ysize = imgsize(1);
 halfdiaglen = floor(sqrt(xsize^2+ysize^2)/2);
 
+% testimage2 = im2double(testimage);
 transrange = [-halfdiaglen,1,halfdiaglen];
 
 imgsize = size(testimage);
@@ -46,17 +47,12 @@ total_lines = nplines+nvlines+nhlines;
 
 sprintf('Total number of lines: %d', total_lines)
 
-testimage = imnoise(testimage, 'speckle', 0.15);
+testimage = imnoise(testimage, 'gaussian', 0.25);
+
+% clean up contour map, no labelling
 
 corr = correlation_line(testimage,angrange,transrange,sigma);
 Intensities_Normalization_Fun(corr);
 figure, imagesc(testimage);
-title('Raw Image with Speckle Artificial Noise with Variance of 0.15','FontSize', 14, 'FontWeight', 'bold');
-
-label_string_x = 'Translation (pixels)';
-label_string_y = 'Angle (Degrees)';
-
-xlabel(label_string_x, 'FontSize', 12, 'FontWeight', 'bold');
-ylabel(label_string_y,'FontSize', 12, 'FontWeight', 'bold');
 
 end     

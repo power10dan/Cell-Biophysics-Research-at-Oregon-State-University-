@@ -1,4 +1,4 @@
-% function Peak_Finding(correlation_map, user_low, user_high, testimage)
+% function Peak_Finding(correlation_map, user_low, user_high)
 % 
 % Description:
 %        
@@ -16,13 +16,13 @@
 % Final conditions: None 
 %
 
-function Peak_Finding(correlation_map, user_low, user_high, testimage)
+function [Outliers, Grouped_array] = Peak_Finding(correlation_map, user_low, user_high)
 
     % boundaries to obtain all intensities within the contour matrix
     max_intensity = 1.0;
     
     C = contour(correlation_map);
-
+  
     % find the indices of peaks within this region 
     peak_region_idx = find(C > user_low & C < max_intensity); % user_input_low < intensity <= max_intensity
  
@@ -35,7 +35,11 @@ function Peak_Finding(correlation_map, user_low, user_high, testimage)
     % group and determine outliers. 
     [outliers, grouped_array_data] = Find_Max_Fun(parsed_contour_data);
     %count intensities and plot them 
-    Count_Intensity_And_Export_Figure(outliers, grouped_array_data, user_low,user_high, testimage);
+    Count_Intensity_And_Export_Figure(outliers, grouped_array_data, user_low,user_high);
+    
+    Outliers = outliers;
+    Grouped_array = grouped_array_data;
+    
   
 end
 % function parsed_data = Peak_Contour_Data(peak_coord, contour_matrix)
@@ -133,7 +137,8 @@ function [outliers, intensity_array] = Find_Max_Fun(intensity_struct_data)
     outliers = new_intensity_struct_data;
     intensity_array = min_intensity_group;
    
- end
+end
+ 
 % function [min_intensity_data, new_intensity_struct_data] = Group_calc(intensity_data_struct, size_struct_data)
 % 
 % Description:
@@ -210,7 +215,7 @@ function [min_intensity_data, new_intensity_struct_data] = Group_calc(intensity_
     
 end
 
-% function Count_Intensity_And_Export_Figure(out_lier,intensity_array, low_intensity, high_intensity, testimage)
+% function Count_Intensity_And_Export_Figure(out_lier,intensity_array, low_intensity, high_intensity)
 % 
 % Description:
 %        
@@ -234,13 +239,13 @@ end
 % Final conditions: None  
 
 
-function Count_Intensity_And_Export_Figure(out_lier,intensity_array, low_intensity, high_intensity, testimage)
+function Count_Intensity_And_Export_Figure(out_lier,intensity_array, low_intensity, high_intensity)
      
      sz_intensity_array = size(intensity_array);
      sz_outlier = size(out_lier);
      count_markers = 0;   
      num_outliers = sz_outlier(2);
-    
+     
      % go through each column and locate the intensities
      for idx = 1:sz_intensity_array(2)
         
@@ -256,12 +261,9 @@ function Count_Intensity_And_Export_Figure(out_lier,intensity_array, low_intensi
                  
                x_cord = intensity_array{non_empty_idx,idx}.average_coordinate_x;
                y_cord = intensity_array{non_empty_idx,idx}.average_coordinate_y;
-               intensity = intensity_array{non_empty_idx, idx}.region_intensity;
                
-               plot(x_cord,y_cord,'+','LineWidth',2,'MarkerSize',10,'MarkerEdgeColor','b','MarkerFaceColor',[0.5,0.5,0.5]);
-               % Label the points with the corresponding 'x' value
-               labelstr = sprintf('%.2f, %.2f, %1.2f', x_cord, y_cord, intensity);
-               text(x_cord,y_cord, labelstr, 'HorizontalAlignment', 'right','FontWeight', 'bold','BackgroundColor',[.7 .9 .7]);
+               plot(x_cord,y_cord,'+','LineWidth',2,'MarkerSize',20,'MarkerEdgeColor','b','MarkerFaceColor',[0.5,0.5,0.5]);
+          
                count_markers = count_markers + 1;
              end
              
@@ -274,15 +276,11 @@ function Count_Intensity_And_Export_Figure(out_lier,intensity_array, low_intensi
                % last position of the column
                x_cord = intensity_array{non_empty_idx(end), idx}.average_coordinate_x;
                y_cord = intensity_array{non_empty_idx(end), idx}.average_coordinate_y;
-               intensity = intensity_array{non_empty_idx(end), idx}.region_intensity;
                hold on
-               plot(x_cord,y_cord,'+','LineWidth',2,'MarkerSize',10,'MarkerEdgeColor','b','MarkerFaceColor',[0.5,0.5,0.5]);
-               % Label the points with the corresponding 'x' value
-               labelstr = sprintf('%.2f, %.2f, %1.2f', x_cord, y_cord, intensity);
-               text(x_cord,y_cord, labelstr, 'HorizontalAlignment', 'right','FontWeight', 'bold','BackgroundColor',[.7 .9 .7]);
-          
-               
+               plot(x_cord,y_cord,'+','LineWidth',2,'MarkerSize',20,'MarkerEdgeColor','b','MarkerFaceColor',[0.5,0.5,0.5]);
+              
                count_markers = count_markers + 1;
+             
              end
         
          end
@@ -301,22 +299,24 @@ function Count_Intensity_And_Export_Figure(out_lier,intensity_array, low_intensi
                
                  x_cord = out_lier(idx_2, idx).average_coordinate_x;
                  y_cord = out_lier(idx_2, idx).average_coordinate_y;
-                 intensity_outlier = out_lier(idx_2, idx).region_intensity;
+                
+                 plot(x_cord,y_cord,'+','LineWidth',2,'MarkerSize',20,'MarkerEdgeColor','b','MarkerFaceColor',[0.5,0.5,0.5]);
                  
-                 plot(x_cord,y_cord,'+','LineWidth',2,'MarkerSize',10,'MarkerEdgeColor','b','MarkerFaceColor',[0.5,0.5,0.5]);
-                 % Label the points with the corresponding 'x' value
-                 labelstr = sprintf('%.2f, %.2f, %1.2f', x_cord, y_cord, intensity_outlier);
-                 text(x_cord,y_cord, labelstr, 'HorizontalAlignment', 'right', 'FontWeight', 'bold','BackgroundColor',[.7 .9 .7]);
                  count_markers = count_markers + 1;
              end
              
          end
     
-     end     
+     end
+          
+     xlabel('Translations (Pixels)','FontSize', 18);
      
-     fprintf('There are %d peaks that are greater %f and smaller than %f by a decimal precision of 0.1\n', count_markers, low_intensity, high_intensity);
- 
+     ylabel('Angles (Degrees)','FontSize', 18);
+   
+     fprintf('There are %d peaks that are greater %f and smaller than %f by a decimal precision of 0.1\n',...
+                                                            count_markers, low_intensity, high_intensity);
      hold off
+   
  
 end
 
