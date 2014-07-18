@@ -50,9 +50,16 @@ function CorrelationaAndPeakFinding(image_to_be_tested)
         transrange  = [-halfdiaglen,1,halfdiaglen];
         ang = [0,1,179];
         sig = 1.1;
-       
+        
         corr = correlation_line(image_to_test_cropped, ang, transrange,sig);
-
+        high_value = max(corr(:));
+        low_image = 0.34; % default intensity used to normalize the image
+        corr(corr < low_image) = 0;
+        corr = corr ./ high_value;
+        normxcorr2(corr)
+        
+        C = contour(coor2)
+        return;
        
         %cluster peaks algorithm? smarter way to do this? 
         % smartly determine threshold of image?
