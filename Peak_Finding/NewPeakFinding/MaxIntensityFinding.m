@@ -14,20 +14,22 @@
 % correlation map. 
 %
 
-function Intensity_Map = MaxIntensityFinding (correlation_map)
+function MaxIntensityFinding (correlation_map)
 
     % filter all pixel data that are below average
     correlation_map = transpose(correlation_map(find(correlation_map > 0)));
-   
+    
     % traverse through first half of matrix to find local maximums 
-    Intensity_Map = GenerateIntensityMap(correlation_map);
+    GenerateIntensityMap(correlation_map);
+    
+    figure, imagesc(correlation_map);
   
 end
 
 % function Intensity_Map_Matrix = GenerateIntensityMap(corr_matrix)
 %
 % Description: 
-% This function generates intensity map for individual correlation matrix
+% This function generates intensity map for a user-inputted correlation matrix
 %
 % Fields: corr_matrix
 %
@@ -36,27 +38,63 @@ end
 % Post-Condition: an intensity map showing where the maximums are on the
 % correlation map. 
 %
-function Intensity_Map_Matrix = GenerateIntensityMap(corr_matrix)
-
-    
+function GenerateIntensityMap (corr_matrix)
+   
     distance_threshold = 10;  % dummy value, subject to change
     
     size_corr = size(corr_matrix);
     
-    for idx = 1 : size_corr(2)
-        
-        ref_pixel = corr_matrix(idx);
-        
-        % commence pixel comparison 
-        for idx2 = 1:distance_threshold
-        
-        
-        
-        
-        end
-
+    % create an intensity map grid plot
+    intensity_map = zeros(size_corr(1), size_corr(2));
+    grid on; 
+ 
+    % parse out 1st 10 rows of matrix 
+    initial_comparison_matrix = corr_matrix(:,1:distance_threshold);
     
-
+    for idx = 1 : numel(initial_comparison_matrix)
+        
+        % get starting pixel and find its index in the matrix
+        ref_pixel = initial_comparison_matrix(idx);
+        index_ref_pixel = find(initial_comparison_matrix == ref_pixel);
+        [xcord, ycord] = ind2sub(size(initial_comparison_matrix, index_ref_pixel));
+        
+        % find all the values that are bigger than the ref_pixel 
+        found_maximum_index = find(comparison_matrix > ref_pixel);     
+        
+        switch found_maximum_index
+           
+            case numel(found_maximum_index) > 0
+             
+                hold on;
+                plot(xcord, ycord,'+', 'MarkerSize', 10, 'MarkerFaceColor', 'r');
+                hold off;
+        
+            case isempty(found_maximum_index)
+            
+                hold on;
+                plot(xcord, ycord,'x', 'MarkerSize', 10, 'MarkerFaceColor', 'k');
+                hold off;                                  
+            
+            otherwise
+                
+                disp('Something is wrong');
+         
+        end
+        
+        if idx == numel(initial_comparison_matrix)
+            
+            if idx < numel(corr_matrix)
+     
+                break;
+            
+            end
+            
+        else 
+            
+             initial_comparison_matrix = corr_matrix(:,distance_threshold+1:distance_threshold+10);
+       
+        end
+      
     end
 
 end
