@@ -2,8 +2,8 @@
 %
 % Description: 
 % This function finds the maximum values inside a Correlation
-% Map and generate an intensity map with markers plotted on the map to
-% locate  the maximums on the correlation map. 
+% Map and generates an intensity map with markers plotted on the map to
+% locate the maximums on the correlation map. 
 %
 % Fields: correlation_map 
 %
