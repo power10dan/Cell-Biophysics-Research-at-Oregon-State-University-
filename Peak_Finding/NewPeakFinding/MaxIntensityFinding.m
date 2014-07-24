@@ -17,37 +17,37 @@
 function MaxIntensityFinding (correlation_map)
     
     figure, imagesc(correlation_map);
-    distance_threshold = 10;  % dummy value, subject to change
+    correlation_map(364.
     
+    distance_threshold = 10;  % dummy value, subject to change
+        
     size_corr = size(correlation_map);
     
     % create an intensity map grid plot
     intensity_map = zeros(size_corr(1), size_corr(2));
-    figure, imagesc(intensity_map);
-  
-    % parse out 1st 10 rows of matrix 
-    initial_comparison_matrix = correlation_map(:,1:distance_threshold);
-    
-    for idx = 1 : numel(initial_comparison_matrix)                   
+    figure, imagesc(intensity_map);  
+         
+    for idx = 1:10:size_corr(2)
+
+        if idx + distance_threshold < size_corr(2)
+            % parse out 1st 10 rows of matrix
+            initial_comparison_matrix = correlation_map(:,idx:idx+distance_threshold);
+      
+            % find maximum values in every single column of the initial matrix
+            local_max_values = max(initial_comparison_matrix);
+            maximum_pixel = max(local_max_values)
+            
+            % index of maximum pixel
+            index_ref_pixel = find(correlation_map == maximum_pixel)
+            [xcord, ycord] = ind2sub(size(correlation_map), index_ref_pixel)
+            
+            hold on;
+            plot(xcord, ycord,'x', 'MarkerSize', 10, 'MarkerFaceColor', 'k');
+            hold off;
         
-        % find maximum values in every single column of the initial matrix
-        local_max_values = max(initial_comparison_matrix)
-        maximum_pixel = max(local_max_values);      
-        
-        % index of maximum pixel
-        index_ref_pixel = find(initial_comparison_matrix == maximum_pixel);
-        [xcord, ycord] = ind2sub(size(initial_comparison_matrix), index_ref_pixel);
-              
-        hold on;
-        plot(xcord, ycord,'x', 'MarkerSize', 10, 'MarkerFaceColor', 'k');
-        hold off;
-       
-        % continue parsing every 10 rows of the corr_matrix
-        initial_comparison_matrix = correlation_map(:,distance_threshold+1:distance_threshold+10);
-       
-        
+        end 
+            
     end
-  
-  
+ 
 end
 
