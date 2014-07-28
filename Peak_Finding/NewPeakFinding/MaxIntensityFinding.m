@@ -1,6 +1,6 @@
 % function MaxIntensityFinding (correlation_map)
 % 
-% Modifications of program other than modified by me: 
+% Modifications of program other than Dan Lin: 
 % Bo Sun, 7/25/14
 %
 % Description: 
@@ -16,15 +16,16 @@
 % Post-Condition: an intensity map showing where the maximums are on the
 % correlation map. 
 
-function [label_map] = MaxIntensityFinding (correlation_map,pars)
+function [label_map] = MaxIntensityFinding (correlation_map,dist_input)
     
-    if(isfield(pars,'distance_threshold'))
+    if(nargin == 2)
         
-        distance_threshold = pars.distance_threshold ;
+        distance_threshold = dist_input;
     
     else
         
-        distance_threshold = 10;  % dummy value, subject to change
+        distance_threshold = 10;  % default value if user didn't input anything for dist_input
+    
     end
     
     size_corr = size(correlation_map);
