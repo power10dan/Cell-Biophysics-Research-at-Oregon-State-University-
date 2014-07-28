@@ -1,4 +1,4 @@
-% function TestMaxIntensityFinder
+% function FixedMaximumValueTesting
 % 
 % Description: 
 % Testing function for MaxIntensityFinding.m
@@ -10,7 +10,7 @@
 % Post-Condition: none
 %
 
-function TestMaxIntensityFinder
+function FixedMaximumValueTesting
 
     image_test = zeros(120,100);
     
