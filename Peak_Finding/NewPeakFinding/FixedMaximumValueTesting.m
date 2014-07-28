@@ -1,7 +1,8 @@
 % function FixedMaximumValueTesting
 % 
 % Description: 
-% Testing function for MaxIntensityFinding.m
+% Testing function for MaxIntensityFinding.m with fixed maximum pixel
+% values at random positions within each column of the image matrix
 %
 % Fields: none
 %
