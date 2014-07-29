@@ -11,7 +11,6 @@
 % Post-Condition: none
 %
 
-
 function MixedPixelTesting
    
     image_test = zeros(120,100);
@@ -21,7 +20,7 @@ function MixedPixelTesting
     sz_image_test = size(image_test);
     
     num_random_pos = 20;
-    max_values_cell = cell(1,sz_image_test(2));
+    max_values_matrix = zeros(1,sz_image_test(2));
  
     for idx = 1: sz_image_test(2)
 
@@ -30,14 +29,13 @@ function MixedPixelTesting
         
         for idx2 = 1:numel(rand_positions)
             
-           max_pixel_value = rand(255,1,1);
+           max_pixel_value = randi(255,1,1);        
            col(rand_positions(idx2)) = max_pixel_value; 
             
         end
         
         local_max_values_at_col = max(col);
-        max_value = max(local_max_values_at_col);
-        max_values_cell{idx} = max_value;
+        max_values_matrix(idx) = local_max_values_at_col;
         
         image_test(:,idx) = col;
         
@@ -45,7 +43,23 @@ function MixedPixelTesting
     
     % Put result image into function
     label_map = MaxIntensityFinding(image_test);
+    figure,imagesc(image_test);
+    imagesc(label_map);
     
-  
-
+    % find index of max value
+    % fix this part, still in progress
+    for idx3 = 1:numel(max_values_matrix)
+     
+       max_value_label_map_index = find(label_map == 1)
+       max_value_image_map_index = find(image_test == max_values_matrix(idx3))
+       
+       if ismember(max_value_label_map_index, max_value_image_map_index) == 0
+           disp('Test Not Pass, Something Went Wrong');
+           return;
+       end
+        
+        
+    end   
+    
+ 
 end
