@@ -42,17 +42,12 @@ function MixedPixelTesting
     end
     
     % Put result image into function
-    label_map = MaxIntensityFinding(image_test,15);
-    return;
+    label_map = MaxIntensityFinding(image_test,10);
+    indx_max = find(label_map == 1);
+    max_values = image_test(indx_max);
+
+    disp(max_values)
     
-    % need to come up with better test cases
-%     max_value_label_map_index = find(label_map == 1);
-%     max_values = sort(image_test(max_value_label_map_index))
-%     sort(max_values_matrix)
-%     figure,imagesc(image_test);
-    
-    
-    
-    
- 
+    % need more work 
+
 end
