@@ -163,6 +163,28 @@ function pushbutton3_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+    if isempty(get(handles.listbox1,'string')) 
+              
+        [image_file_name, image_file_path] = GetImageFile;
+        
+        % vectorized index to get all of the names of the file
+        idx = 1:numel(image_file_name);
+        set(handles.listbox1,'String',{image_file_name(idx).name});
+        
+    else 
+        
+        
+        
+        
+        
+   
+    end        
+    
+
+
+
+    
+    
 
 % --- Executes on button press in pushbutton4.
 function pushbutton4_Callback(hObject, eventdata, handles)
@@ -181,8 +203,8 @@ function listbox1_Callback(hObject, eventdata, handles)
               
         return;
    
-    end   
-
+    end        
+    
     [inspected_image_name, inspected_image_name_pos] = ListBoxVariableInspection(handles);
     
     % read image and display image on axes1
