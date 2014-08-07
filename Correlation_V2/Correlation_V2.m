@@ -162,28 +162,27 @@ function pushbutton3_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton3 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
-    if isempty(get(handles.listbox1,'string')) 
-              
-        [image_file_name, image_file_path] = GetImageFile;
-        
-        % vectorized index to get all of the names of the file
-        idx = 1:numel(image_file_name);
-        set(handles.listbox1,'String',{image_file_name(idx).name});
-        
-    else 
-        
-        
-        
-        
-        
-   
-    end        
     
-
-
-
+    global path_storage;    
     
+    [image_file_name, image_file_path] = GetAndSetImageFile(handles);
+     
+    image_file_path_transposed = transpose(image_file_path);
+      
+    % if path_stroage is empty, set the variable equal to path_storage.
+    % Else, concat path_storage file name list with new file name list
+    
+    if isempty(path_storage)
+        
+        path_storage = image_file_path_transposed;
+        
+    else
+                
+        existing_path_list = path_storage;
+        new_path_list = vertcat(existing_path_list, image_file_path_transposed);
+        path_storage = new_path_list;
+        
+    end
     
 
 % --- Executes on button press in pushbutton4.
@@ -198,7 +197,9 @@ function listbox1_Callback(hObject, eventdata, handles)
 % hObject    handle to listbox1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    
+
+    global path_storage;
+
     if isempty(get(handles.listbox1,'string')) 
               
         return;
@@ -208,7 +209,7 @@ function listbox1_Callback(hObject, eventdata, handles)
     [inspected_image_name, inspected_image_name_pos] = ListBoxVariableInspection(handles);
     
     % read image and display image on axes1
-    image_read = imread(path_storage{image_name_pos});   
+    image_read = imread(path_storage{inspected_image_name_pos});   
     axes(handles.axes1);
     image_to_display_handle = imagesc(image_read);
     
