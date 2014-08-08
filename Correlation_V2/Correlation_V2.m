@@ -155,6 +155,9 @@ function pushbutton2_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton2 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+    
+    % remove everything from memory
+    clear all
 
 
 % --- Executes on button press in pushbutton3.
@@ -194,8 +197,7 @@ function pushbutton3_Callback(hObject, eventdata, handles)
         
        new_path_list = horzcat(existing_path_list, image_file_path);  % file path from uigetdir, 
                                                                       % which returns a n x m cell with image's file path 
-                                                                      % and name together
-       
+                                                                      % and name together      
     end
 
     path_storage = new_path_list;
