@@ -1,5 +1,6 @@
 % function status = CheckFileName(imagename, image_position)
 % Description:
+%   
 %   This function checks whether the file selected by the user is a valid
 %   image file  
 %
@@ -16,28 +17,31 @@
 %     Returns 1 if the input passes the test, 0 if not
 %
 
-function status = CheckFileName(imagename, image_position)
-  
-    % File name can be anything, but format must be jpg, tif, tiff, or png
+function [sanitized_image_name, sanitized_image_pos] = CheckFileName(list_box_handle)
+
+    list_of_image_name = get(list_box_handle.listbox1, 'string');
+    image_name_pos = get(list_box_handle.listbox1, 'value');
     
-    [path_str, name, ext] = fileparts(imagename{image_position});
-     
+    % check file extension 
+    [path_str, name, ext] = fileparts(list_of_image_name{image_name_pos});
+    
+    % File name can be anything, but format must be jpg, tif, tiff, or png 
     valid_image_extensions = {'.jpg', '.png', '.tif', '.tiff'};
-  
-    
+      
     for idx = 1:numel(valid_image_extensions)
        
         if idx == numel(valid_image_extensions)
             
             errordlg('Your selected image file is not supported. Supported image files formats are jpg, tiff, tif, or png');
-            status = 0;
+            sanitized_image_name = '';
             
         end
         
-        if strcmp(ext, valid_image_extensions{idx}) == 0
+        if strcmp(ext, valid_image_extensions{idx}) == 1
             
-            status = 1;
-            break;
+            sanitized_image_name = list_of_image_name{image_name_pos};
+            sanitized_image_pos = image_name_pos;
+            return
             
         end
     
