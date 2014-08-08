@@ -34,6 +34,7 @@ function [sanitized_image_name, sanitized_image_pos] = CheckFileName(list_box_ha
             
             errordlg('Your selected image file is not supported. Supported image files formats are jpg, tiff, tif, or png');
             sanitized_image_name = '';
+            sanitized_image_pos = '';
             
         end
         
