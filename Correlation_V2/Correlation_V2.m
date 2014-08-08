@@ -163,36 +163,41 @@ function pushbutton3_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
     
-    global path_storage;    
+    global path_storage;        
     
-         
     [image_file_name, image_file_path] = GetAndSetImageFile(handles);
     existing_path_list = path_storage;   
       
     % if path_stroage is empty, set the variable equal to path_storage.
     % Else, concat path_storage file name list with new file name list
     
-    if isempty(path_storage) 
+    if isempty(path_storage) && ~iscell(image_file_path)
+       
+        image_file_path = {image_file_name};
         
         path_storage = image_file_path;
         return
         
     end
     
-    %image_file_path_transposed = transpose(image_file_path);
+    % GetAndSetImageFile returns the full path of the image
+    % file with the image's name inside image_file_name variable if uigetfile is invoked. Thus, we
+    % only have to add this path to the path_storage variable. 
     
     if ~iscell(image_file_path)
         
-        image_file_path = {image_file_path};
+        image_file_path = {image_file_name};
    
         new_path_list = horzcat(existing_path_list, image_file_path);
         
     else
         
-       new_path_list = horzcat(existing_path_list, image_file_path);
+       new_path_list = horzcat(existing_path_list, image_file_path);  % file path from uigetdir, 
+                                                                      % which returns a n x m cell with image's file path 
+                                                                      % and name together
        
     end
-        
+
     path_storage = new_path_list;
 
 
@@ -223,10 +228,10 @@ function listbox1_Callback(hObject, eventdata, handles)
     [sanitized_image_name, sanitized_image_pos] = CheckFileName(handles);
     
     if ~isempty(sanitized_image_name)
-        path_storage
+
         % read image and display image on axes1
         image_read = imread(path_storage{sanitized_image_pos});   
-        axes(handles.axes1);
+        axes(handles.axes3);
         image_to_display_handle = imagesc(image_read);
         % display crop image dialogue if user click on image
         set(image_to_display_handle, 'ButtonDownFcn',{@CropImage,image_read,handles});
