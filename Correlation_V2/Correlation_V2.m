@@ -165,24 +165,38 @@ function pushbutton3_Callback(hObject, eventdata, handles)
     
     global path_storage;    
     
+         
     [image_file_name, image_file_path] = GetAndSetImageFile(handles);
-     
-    image_file_path_transposed = transpose(image_file_path);
+    existing_path_list = path_storage;   
       
     % if path_stroage is empty, set the variable equal to path_storage.
     % Else, concat path_storage file name list with new file name list
     
-    if isempty(path_storage)
+    if isempty(path_storage) 
         
-        path_storage = image_file_path_transposed;
-        
-    else
-                
-        existing_path_list = path_storage;
-        new_path_list = vertcat(existing_path_list, image_file_path_transposed);
-        path_storage = new_path_list;
+        path_storage = image_file_path;
+        return
         
     end
+    
+    %image_file_path_transposed = transpose(image_file_path);
+    
+    if ~iscell(image_file_path)
+        
+        image_file_path = {image_file_path};
+   
+        new_path_list = horzcat(existing_path_list, image_file_path);
+        
+    else
+        
+       new_path_list = horzcat(existing_path_list, image_file_path);
+       
+    end
+        
+    path_storage = new_path_list;
+
+
+   
     
 
 % --- Executes on button press in pushbutton4.
@@ -206,15 +220,25 @@ function listbox1_Callback(hObject, eventdata, handles)
    
     end        
     
-    [inspected_image_name, inspected_image_name_pos] = ListBoxVariableInspection(handles);
+    [sanitized_image_name, sanitized_image_pos] = CheckFileName(handles);
     
-    % read image and display image on axes1
-    image_read = imread(path_storage{inspected_image_name_pos});   
-    axes(handles.axes1);
-    image_to_display_handle = imagesc(image_read);
+    if ~isempty(sanitized_image_name)
+        path_storage
+        % read image and display image on axes1
+        image_read = imread(path_storage{sanitized_image_pos});   
+        axes(handles.axes1);
+        image_to_display_handle = imagesc(image_read);
+        % display crop image dialogue if user click on image
+        set(image_to_display_handle, 'ButtonDownFcn',{@CropImage,image_read,handles});
+        
+    else 
+        
+        return
+   
+    end
+        
     
- % display crop image dialogue if user click on image
- set(image_to_display_handle, 'ButtonDownFcn',{@CropImage,image_read,handles});
+ 
 
 % Hints: contents = cellstr(get(hObject,'String')) returns listbox1 contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from listbox1
