@@ -155,9 +155,14 @@ function pushbutton2_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton2 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+   
     
-    % remove everything from memory
-    clear all
+    
+    
+    
+    
+    
+    
 
 
 % --- Executes on button press in pushbutton3.
@@ -202,10 +207,6 @@ function pushbutton3_Callback(hObject, eventdata, handles)
 
     path_storage = new_path_list;
 
-
-   
-    
-
 % --- Executes on button press in pushbutton4.
 function pushbutton4_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton4 (see GCBO)
@@ -230,7 +231,6 @@ function listbox1_Callback(hObject, eventdata, handles)
     [sanitized_image_name, sanitized_image_pos] = CheckFileName(handles);
     
     if ~isempty(sanitized_image_name)
-
         % read image and display image on axes1
         image_read = imread(path_storage{sanitized_image_pos});   
         axes(handles.axes3);
