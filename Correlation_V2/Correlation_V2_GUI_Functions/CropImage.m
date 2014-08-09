@@ -89,7 +89,7 @@ function CropImage(src, evnt,image,handles)
     new_image = imcrop(image,[xcenter,ycenter,width,height]);
     
     % select axes one and display cropped image
-    axes(handles.axes1);
+    axes(handles.axes3);
     new_image_display_handle = imagesc(new_image);
     
     % make new image as button for user to click on if the user want to
