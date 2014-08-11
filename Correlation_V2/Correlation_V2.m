@@ -52,7 +52,9 @@ function Correlation_V2_OpeningFcn(hObject, eventdata, handles, varargin)
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   unrecognized PropertyName/PropertyValue pairs from the
 %            command line (see VARARGIN)
-
+    
+    clearvars -global path_storage
+    
 % Choose default command line output for Correlation_V2
 handles.output = hObject;
 
@@ -148,22 +150,29 @@ function pushbutton1_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+    
+     global path_storage
+     entries = get(handles.listbox1, 'string');
+     index_selected = get(handles.listbox1, 'value');   
+     
+     entries{index_selected} = [];
+     new_entries = entries(~cellfun('isempty',entries));
+     path_storage{index_selected} = [];
+        
+     path_storage = path_storage(~cellfun(@isempty, path_storage));
+       
+     set(handles.listbox1, 'String', new_entries);
+     set(handles.listbox1, 'string', new_entries, 'Value',1);
 
 % --- Executes on button press in pushbutton2.
 function pushbutton2_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton2 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+    clearvars -global path_storage
+    set(handles.listbox1, 'String', '');
+    
    
-    
-    
-    
-    
-    
-    
-    
-
 
 % --- Executes on button press in pushbutton3.
 function pushbutton3_Callback(hObject, eventdata, handles)
@@ -207,6 +216,10 @@ function pushbutton3_Callback(hObject, eventdata, handles)
 
     path_storage = new_path_list;
 
+
+   
+    
+
 % --- Executes on button press in pushbutton4.
 function pushbutton4_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton4 (see GCBO)
@@ -227,10 +240,11 @@ function listbox1_Callback(hObject, eventdata, handles)
         return;
    
     end        
-    
+
     [sanitized_image_name, sanitized_image_pos] = CheckFileName(handles);
     
     if ~isempty(sanitized_image_name)
+
         % read image and display image on axes1
         image_read = imread(path_storage{sanitized_image_pos});   
         axes(handles.axes3);
