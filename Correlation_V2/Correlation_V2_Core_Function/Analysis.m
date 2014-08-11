@@ -1,43 +1,37 @@
-% function corr_res = Analysis(theta,Brange,Sigma)
+% function corr_res = Analysis(theta_range,brange,sigma, image_path)
+%    
 % Description:
 %       
-%    The function calls the correlation script and performs the correlation
-%    analysis and returns the result 
+%    The function performs Correlation analysis  
 %
 % Fields:
 %
-%      theta: Angle range for image 
-%      Brange: the translational range for the image 
-%      Sigma: The correlation factor 
+%      theta_range: Angle range for image 
+%      brange: the translational range for the image 
+%      sigma: The correlation factor 
+%      image_path: path to the image to be analyzed
 %
 % Initial conditions: 
-%      Theta and Brange must be numeric integers, no control characters, and are  
-%      in the form "<start>:<step>:<end>. Sigma can be a decimal value. 
+%      theta_range and brange must be of type integer and are  
+%      in the form "<start>:<step>:<end>". sigma can be integer or decimal values. 
+%      image_path must be a string type variable. 
+%
 %
 % Final conditions: 
-%      Returns the correlation analysis map.
+%      Returns a correlation analysis map
 %
 %
 
-function corr_res = Analysis(theta,Brange,Sigma)
+function corr_res = Analysis(theta_range,brange,sigma, image_path)
     
-    global image_read;
-    
-     if isempty(image_read)
-    
-        errordlg('You did not select an image');
-        corr_res = 0;
-        return;
-    
-    end
-    
-    I = rgb2gray(image_read);
-    image = single(I);
-    
-    thet = [theta(1),theta(2),theta(3)];
-    Brang = [Brange(1),Brange(2),Brange(3)];
+    image_to_be_analyzed = imread(image_path);
    
-    corr = correlation_line(image, thet, Brang, Sigma);
-    disp('Processing image complete');
-    corr_res = corr; 
+    I = rgb2gray(image_to_be_analyzed);
+
+    image_input = single(I);
+    theta_input = [theta_range(1),theta_range(2),theta_range(3)];
+    b_range_input = [brange(1),brange(2),brange(3)];
+
+    corr = correlation_line(image_input, theta_input, b_range_input, sigma);
+    corr_res = corr;
 end
