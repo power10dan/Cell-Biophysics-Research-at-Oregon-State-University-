@@ -19,6 +19,7 @@
 
 function [sanitized_image_name, sanitized_image_pos] = CheckFileName(list_box_handle)
 
+
     list_of_image_name = get(list_box_handle.listbox1, 'string');
     image_name_pos = get(list_box_handle.listbox1, 'value');
     
@@ -35,7 +36,7 @@ function [sanitized_image_name, sanitized_image_pos] = CheckFileName(list_box_ha
             errordlg('Your selected image file is not supported. Supported image files formats are jpg, tiff, tif, or png');
             sanitized_image_name = '';
             sanitized_image_pos = '';
-            
+            break
         end
         
         if strcmp(ext, valid_image_extensions{idx}) == 1
@@ -47,6 +48,7 @@ function [sanitized_image_name, sanitized_image_pos] = CheckFileName(list_box_ha
         end
     
     end
+   
    
 end
           
