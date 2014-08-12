@@ -272,18 +272,25 @@ function pushbutton7_Callback(hObject, eventdata, handles)
     
     global path_storage
     
-    UserVariableInputSanitization(handles);
+    [ theta, brange, sigma ] = UserVariableInputSanitization(handles);
 
+    
     for idx = 1:numel(path_storage)
         
-        corr_map = Analysis(path_storage{idx}, );
+        corr_map = Analysis(path_storage{idx}, theta, brange, sigma);
         peak_map = MaxIntensityFinding(corr_map);
         
+        % display corr_map and peak_map on graph
+        axes(handles.axes6);
+        imagesc(corr);
+        axes(handles.axes7);
+        imagesc(peak_map);
         
+        experiment_name = sprintf('experiment_number_%d',idx);
         
-        
-        
-        
+        % save data 
+        SaveData(experiment_name);
+    
     end
 
 
