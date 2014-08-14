@@ -30,6 +30,28 @@ function [theta_value, brange, sigma] = UserVariableInputSanitization(handles)
     % get sigma 
     sigma_user_input = get(handles.edit2, 'Value');
     
+    if theta_user_input_begin < theta_user_input_range
+        
+        errordlg('Your origin in theta cannot be bigger than your range ');
+        theta_value = '';
+        brange      = '';
+        sigma       = '';
+        return
+  
+    end
+    
+    
+    if brange_user_input_begin  <  brange_user_input_range
+        
+        errordlg('Your origin for brange cannot be bigger than your range');
+        theta_value = '';
+        brange      = '';
+        sigma       = '';
+        return
+  
+    end
+ 
+    
     % check if user inputs for theta and brange are positive integers
     if (sign(theat_user_input_begin) == 1 && mod(theat_user_input_begin, 1) == 0) ...
         && (sign(theta_user_input_step) == 1 &&  mod(theat_user_input_step, 1)== 0 ) ...
