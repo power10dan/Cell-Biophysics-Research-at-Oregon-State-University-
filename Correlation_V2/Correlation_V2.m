@@ -207,7 +207,7 @@ function listbox1_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-    global path_storage;
+    global path_storage
 
     if isempty(get(handles.listbox1,'string')) 
               
@@ -275,11 +275,14 @@ function pushbutton7_Callback(hObject, eventdata, handles)
     
     [ theta, brange, sigma ] = UserVariableInputSanitization(handles);
     
+    % File name can be anything, but format must be jpg, tif, tiff, or png 
+    valid_image_extensions = {'.jpg', '.png', '.tif', '.tiff'};
+    
     for idx = 1:numel(path_storage)
-        
-        [sanitized_image_name, sanitized_image_pos] = CheckFileName(handles);
-        
-        if ~isempty(sanitized_image_name)
+            
+        [pathstr, file, ext] = fileparts(path_storage{idx});
+
+        if ismember(ext,valid_image_extensions) == 1
             
             corr_map = Analysis(path_storage{idx}, theta, brange, sigma);
             peak_map = MaxIntensityFinding(corr_map);
@@ -287,7 +290,7 @@ function pushbutton7_Callback(hObject, eventdata, handles)
             % display corr_map and peak_map on graph
             axes(handles.axes6);
             imagesc(corr);
-            axes(handles.axes7);
+            axes(handles.axes11);
             imagesc(peak_map);
         
             experiment_name = sprintf('experiment_number_%d',idx);
@@ -295,7 +298,8 @@ function pushbutton7_Callback(hObject, eventdata, handles)
             % save data 
             SaveData(experiment_name);
     
-        end      
+        end 
+     
     end
 
 % --- Executes on button press in pushbutton8.
