@@ -18,7 +18,7 @@
 function [theta_value, brange, sigma] = UserVariableInputSanitization(handles)
 
     % get theta inputs
-    theat_user_input_begin = get(handles.edit11, 'Value');
+    theta_user_input_begin = get(handles.edit11, 'Value');
     theta_user_input_step  = get(handles.edit12, 'Value');
     theta_user_input_range = get(handles.edit13, 'Value');
     
