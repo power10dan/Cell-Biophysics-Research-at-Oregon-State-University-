@@ -18,20 +18,22 @@
 function [theta_value, brange, sigma] = UserVariableInputSanitization(handles)
 
     % get theta inputs
-    theta_user_input_begin = get(handles.edit11, 'Value');
-    theta_user_input_step  = get(handles.edit12, 'Value');
-    theta_user_input_range = get(handles.edit13, 'Value');
+    theta_user_input_begin = str2num(get(handles.edit11, 'String'));
+    theta_user_input_step  = str2num(get(handles.edit12, 'String'));
+    theta_user_input_range = str2num(get(handles.edit13, 'String'));
     
     % get brange inputs
-    brange_user_input_begin = get(handles.edit1, 'Value');
-    brange_user_input_step  = get(handles.edit9, 'Value');
-    brange_user_input_range = get(handles.edit10, 'Value');
+    brange_user_input_begin = str2num(get(handles.edit1, 'String'));
+    brange_user_input_step  = str2num(get(handles.edit9, 'String'));
+    brange_user_input_range = str2num(get(handles.edit10, 'String'));
     
     % get sigma 
     sigma_user_input = get(handles.edit2, 'Value');
+
     
-    if theta_user_input_begin < theta_user_input_range
+    if theta_user_input_begin > theta_user_input_range
         
+
         errordlg('Your origin in theta cannot be bigger than your range ');
         theta_value = '';
         brange      = '';
@@ -41,41 +43,37 @@ function [theta_value, brange, sigma] = UserVariableInputSanitization(handles)
     end
     
     
-    if brange_user_input_begin  <  brange_user_input_range
+    if brange_user_input_begin  >  brange_user_input_range
         
-        errordlg('Your origin for brange cannot be bigger than your range');
+        errordlg('Your origin for B Eange cannot be bigger than your range');
         theta_value = '';
         brange      = '';
         sigma       = '';
         return
   
     end
- 
+
+    theta_check = (sign(theta_user_input_begin) == 1 && (mod(theta_user_input_begin, 1) == 0) ...
+                  && (sign(theta_user_input_step) == 1 &&  (mod(theta_user_input_step, 1)== 0 )) ...
+                  && (sign(theta_user_input_range) == 1 && (mod(theta_user_input_range, 1) == 0)));
+              
+    brange_check = sign( brange_user_input_begin ) == 1 && (mod( brange_user_input_begin , 1) == 0) ...
+                   && (sign(brange_user_input_step) == 1 &&  (mod(brange_user_input_step, 1)== 0 )) ...
+                   && (sign( brange_user_input_range) == 1 && (mod( brange_user_input_range, 1) == 0));
+               
+    sigma_check = sign(sigma_user_input) == 1;
     
-    % check if user inputs for theta and brange are positive integers
-    if (sign(theat_user_input_begin) == 1 && mod(theat_user_input_begin, 1) == 0) ...
-        && (sign(theta_user_input_step) == 1 &&  mod(theat_user_input_step, 1)== 0 ) ...
-        && (sign(theta_user_input_range) == 1 && mod(theat_user_input_range, 1) == 0)
-    
-        if (sign( brange_user_input_begin ) == 1 && mod( brange_user_input_begin , 1) == 0) ...
-            && (sign(brange_user_input_step) == 1 &&  mod(brange_user_input_step, 1)== 0 ) ...
-            && (sign( brange_user_input_range) == 1 && mod( brange_user_input_range, 1) == 0)
+    if theta_check == 1 && brange_check == 1 && sigma_check == 1
         
-            if sign(sigma_user_input) == 1 % check if user input for sigma is positive 
-        
-                theta_value = [ theat_user_input_begin theta_user_input_step  theta_user_input_range ];
-                brange      = [ brange_user_input_begin  brange_user_input_step brange_user_input_range ];
-                sigma       = sigma_user_input;
-                return;
-    
-    
-            end
-     
-        end
+        theta_value = [ theta_user_input_begin theta_user_input_step theta_user_input_range ];
+        brange      = [ brange_user_input_begin  brange_user_input_step brange_user_input_range ];
+        sigma       = sigma_user_input;
+        return;
+          
         
     else
         
-        errordlg('Your inputs for theta, brange, or sigma is wrong. Inputs for theta and brange must be positive integers and sigma must be positive integer or decimal value');
+        errordlg('Your inputs for theta, brange, or sigma is wrong or empty. Please check your inputs. Inputs for theta and brange must be positive integers and sigma must be positive integer or decimal value');
        
         theta_value = '';
         brange      = '';
