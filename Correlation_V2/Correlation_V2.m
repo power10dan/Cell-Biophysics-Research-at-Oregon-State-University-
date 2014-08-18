@@ -281,10 +281,11 @@ function pushbutton7_Callback(hObject, eventdata, handles)
     for idx = 1:numel(path_storage)
             
         [pathstr, file, ext] = fileparts(path_storage{idx});
-
-        if ismember(ext,valid_image_extensions) == 1
-            
-            corr_map = Analysis(path_storage{idx}, theta, brange, sigma);
+        
+        if ismember(ext,valid_image_extensions) && (~isempty(theta) ...
+                            && ~isempty(brange) && ~isempty(sigma))
+          
+            corr_map = Analysis( theta, brange, sigma, path_storage{idx});
             peak_map = MaxIntensityFinding(corr_map);
         
             % display corr_map and peak_map on graph
@@ -297,8 +298,10 @@ function pushbutton7_Callback(hObject, eventdata, handles)
         
             % save data 
             SaveData(experiment_name);
+            
     
         end 
+        return
      
     end
 
