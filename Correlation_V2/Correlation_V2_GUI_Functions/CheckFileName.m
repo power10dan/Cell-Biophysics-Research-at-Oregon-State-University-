@@ -19,11 +19,10 @@
 
 function [sanitized_image_name, sanitized_image_pos] = CheckFileName(list_box_handle)
 
-
-    list_of_image_name = get(list_box_handle.listbox1, 'string');
-    image_name_pos = get(list_box_handle.listbox1, 'value');
+    list_of_image_name = get(list_box_handle.listbox1, 'String');
+    image_name_pos = get(list_box_handle.listbox1, 'Value');
     
-    % check file extension 
+    % get file extension 
     [path_str, name, ext] = fileparts(list_of_image_name{image_name_pos});
     
     % File name can be anything, but format must be jpg, tif, tiff, or png 
