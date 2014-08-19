@@ -28,24 +28,32 @@ function [theta_value, brange, sigma] = UserVariableInputSanitization(handles)
     brange_user_input_range = str2num(get(handles.edit10, 'String'));
     
     % get sigma 
-    sigma_user_input = get(handles.edit2, 'Value');
+    sigma_user_input = str2num(get(handles.edit2, 'String'));
 
+    image_bay_check = ~isempty(get(handles.listbox1, 'String'));
+    
+    if image_bay_check == 0
+ 
+        errordlg('You have not uploaded anything on the image bay ');
+        theta_value = '';
+        brange      = '';
+        sigma       = '';
+        return
+    end
+        
     
     if theta_user_input_begin > theta_user_input_range
         
-
         errordlg('Your origin in theta cannot be bigger than your range ');
         theta_value = '';
         brange      = '';
         sigma       = '';
-        return
-  
+        return 
     end
-    
-    
+       
     if brange_user_input_begin  >  brange_user_input_range
         
-        errordlg('Your origin for B Eange cannot be bigger than your range');
+        errordlg('Your origin for B Range cannot be bigger than your range');
         theta_value = '';
         brange      = '';
         sigma       = '';
@@ -53,16 +61,17 @@ function [theta_value, brange, sigma] = UserVariableInputSanitization(handles)
   
     end
 
-    theta_check = (sign(theta_user_input_begin) == 1 && (mod(theta_user_input_begin, 1) == 0) ...
-                  && (sign(theta_user_input_step) == 1 &&  (mod(theta_user_input_step, 1)== 0 )) ...
+    theta_check = ~isempty(theta_user_input_step) && ~isempty (theta_user_input_begin) && ~isempty(theta_user_input_range) && ...
+                  ((mod(theta_user_input_begin, 1) == 0) && (sign(theta_user_input_step) == 1 &&  (mod(theta_user_input_step, 1)== 0 )) ...
                   && (sign(theta_user_input_range) == 1 && (mod(theta_user_input_range, 1) == 0)));
               
-    brange_check = sign( brange_user_input_begin ) == 1 && (mod( brange_user_input_begin , 1) == 0) ...
-                   && (sign(brange_user_input_step) == 1 &&  (mod(brange_user_input_step, 1)== 0 )) ...
+    brange_check = ~isempty(brange_user_input_begin) && ~isempty (brange_user_input_step) && ~isempty(brange_user_input_range) && ...
+                   (mod( brange_user_input_begin , 1) == 0) && (sign(brange_user_input_step) == 1 &&  (mod(brange_user_input_step, 1)== 0 )) ...
                    && (sign( brange_user_input_range) == 1 && (mod( brange_user_input_range, 1) == 0));
                
     sigma_check = sign(sigma_user_input) == 1;
     
+     
     if theta_check == 1 && brange_check == 1 && sigma_check == 1
         
         theta_value = [ theta_user_input_begin theta_user_input_step theta_user_input_range ];
