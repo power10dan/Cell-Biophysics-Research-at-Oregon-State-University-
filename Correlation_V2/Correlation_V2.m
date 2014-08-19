@@ -257,6 +257,18 @@ function pushbutton5_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+    global path_storage
+    
+    [ theta, brange, sigma ] = UserVariableInputSanitization(handles);
+    [sanitized_image_name, sanitized_image_pos] = CheckFileName(handles);
+    
+    corr_map_analyzed = Analysis(theta, brange, sigma, path_storage{sanitized_image_pos});
+    axes(handles.axes6);           
+    imagesc(corr_map_analyzed); 
+    
+    peak_map_of_corr_map = MaxIntensityFinding(corr_map_analyzed);    
+    axes(handles.axes11);
+    imagesc(peak_map_of_corr_map);
 
 % --- Executes on button press in pushbutton6.
 function pushbutton6_Callback(hObject, eventdata, handles)
@@ -285,23 +297,26 @@ function pushbutton7_Callback(hObject, eventdata, handles)
         if ismember(ext,valid_image_extensions) && (~isempty(theta) ...
                             && ~isempty(brange) && ~isempty(sigma))
           
-            corr_map = Analysis( theta, brange, sigma, path_storage{idx});
+            corr_map = Analysis(theta, brange, sigma, path_storage{idx});
             peak_map = MaxIntensityFinding(corr_map);
         
-            % display corr_map and peak_map on graph
-            axes(handles.axes6);
-            imagesc(corr);
+            % display image, corr_map, and peak_map on graph
+            exp_image = imread(path_storage{idx});
+            axes(handles.axes10);
+            imagesc(exp_image);
+            
+            axes(handles.axes6);           
+            imagesc(corr_map);
+            
             axes(handles.axes11);
             imagesc(peak_map);
-        
-            experiment_name = sprintf('experiment_number_%d',idx);
-        
+         
             % save data 
+            experiment_name = sprintf('experiment_number_%d',idx);
             SaveData(experiment_name);
             
     
         end 
-        return
      
     end
 
