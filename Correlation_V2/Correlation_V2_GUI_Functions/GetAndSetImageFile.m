@@ -30,13 +30,14 @@ function [image_file_name, image_file_path] = GetAndSetImageFile(handles)
             
             directory_path = uigetdir;
             
-            if directory_path == 0
+             if directory_path == 0
                 
                 image_file_name = '';
                 image_file_path = '';
                 return
                 
             end
+   
             
             files_and_folders_in_directory = dir(directory_path);
             
@@ -76,14 +77,14 @@ function [image_file_name, image_file_path] = GetAndSetImageFile(handles)
             
             [file_name, path_name] = uigetfile;
             
-            if file_name == 0 
+             if file_name == 0
                 
                 image_file_name = '';
-                image_file_path = '';                
+                image_file_path = '';
                 return
                 
             end
-      
+  
             set(handles.listbox1,'String',{file_name});
             
             if isempty(get(handles.listbox1,'string')) 
@@ -97,8 +98,8 @@ function [image_file_name, image_file_path] = GetAndSetImageFile(handles)
                 set(handles.listbox1, 'String', new_listbox_files);
                     
             end
- 
-            image_file_name = strcat(path_name,file_name);
+            
+            image_file_name = strcat(path_name, file_name);
             image_file_path = path_name;
         
             
