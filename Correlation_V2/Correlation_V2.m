@@ -262,13 +262,20 @@ function pushbutton5_Callback(hObject, eventdata, handles)
     [ theta, brange, sigma ] = UserVariableInputSanitization(handles);
     [sanitized_image_name, sanitized_image_pos] = CheckFileName(handles);
     
-    corr_map_analyzed = Analysis(theta, brange, sigma, path_storage{sanitized_image_pos});
-    axes(handles.axes6);           
-    imagesc(corr_map_analyzed); 
+    check_input = ~isempty(theta) && ~isempty(brange) && ~isempty(sigma) ...
+                  && ~isempty(sanitized_image_pos);
+   
+    if check_input == 1
     
-    peak_map_of_corr_map = MaxIntensityFinding(corr_map_analyzed);    
-    axes(handles.axes11);
-    imagesc(peak_map_of_corr_map);
+        corr_map_analyzed = Analysis(theta, brange, sigma, path_storage{sanitized_image_pos});
+        axes(handles.axes6);           
+        imagesc(corr_map_analyzed); 
+    
+        peak_map_of_corr_map = MaxIntensityFinding(corr_map_analyzed);    
+        axes(handles.axes11);
+        imagesc(peak_map_of_corr_map);
+        
+    end
 
 % --- Executes on button press in pushbutton6.
 function pushbutton6_Callback(hObject, eventdata, handles)
