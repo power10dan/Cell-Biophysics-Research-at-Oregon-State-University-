@@ -199,6 +199,17 @@ function pushbutton4_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton4 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+   
+    % clear all list boxes
+    set(handles.edit11, 'String','');
+    set(handles.edit12, 'String','');
+    set(handles.edit13, 'String','');
+    
+    set(handles.edit1, 'String','');
+    set(handles.edit9, 'String','');
+    set(handles.edit10, 'String','');
+    
+    set(handles.edit2, 'String','');  
 
 
 % --- Executes on selection change in listbox1.
@@ -267,7 +278,8 @@ function pushbutton5_Callback(hObject, eventdata, handles)
    
     if check_input == 1
     
-        corr_map_analyzed = Analysis(theta, brange, sigma, path_storage{sanitized_image_pos});
+        corr_map_analyzed = Analysis(theta, brange, sigma, ...
+                                        path_storage{sanitized_image_pos});
         axes(handles.axes6);           
         imagesc(corr_map_analyzed); 
     
@@ -283,6 +295,12 @@ function pushbutton6_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+    prompt = ' Please Enter File Name ';
+    saved_file_name = inputdlg(prompt);
+    
+    % saved_file_name is a cell string. saved_file_name{1} turns the cell
+    % string into a string
+    SaveData(saved_file_name{1});
 
 % --- Executes on button press in pushbutton7.
 function pushbutton7_Callback(hObject, eventdata, handles)
@@ -302,7 +320,7 @@ function pushbutton7_Callback(hObject, eventdata, handles)
         [pathstr, file, ext] = fileparts(path_storage{idx});
         
         if ismember(ext,valid_image_extensions) && (~isempty(theta) ...
-                            && ~isempty(brange) && ~isempty(sigma))
+                                   && ~isempty(brange) && ~isempty(sigma))
           
             corr_map = Analysis(theta, brange, sigma, path_storage{idx});
             peak_map = MaxIntensityFinding(corr_map);
@@ -321,8 +339,7 @@ function pushbutton7_Callback(hObject, eventdata, handles)
             % save data 
             experiment_name = sprintf('experiment_number_%d',idx);
             SaveData(experiment_name);
-            
-    
+               
         end 
      
     end
@@ -339,6 +356,15 @@ function slider1_Callback(hObject, eventdata, handles)
 % hObject    handle to slider1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+
+    slider_max_value = ; % slider_max_value's max size is size of peak finding map
+    
+   
+    set(handles.slider1, 'Max', slider_max_value);
+   
+
+    slider_value = get(hObject, 'Value')
 
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
@@ -528,3 +554,14 @@ function pushbutton12_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton12 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+    
+    
+
+
+
+
+
+
+
+
+
