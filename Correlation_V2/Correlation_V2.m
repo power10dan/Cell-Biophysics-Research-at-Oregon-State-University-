@@ -22,7 +22,7 @@ function varargout = Correlation_V2(varargin)
 
 % Edit the above text to modify the response to help Correlation_V2
 
-% Last Modified by GUIDE v2.5 14-Aug-2014 17:01:05
+% Last Modified by Dan Lin 21-Aug-2014 17:01:05
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -148,9 +148,7 @@ function pushbutton2_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
     clearvars -global path_storage
     set(handles.listbox1, 'String', '');
-    
-   
-
+      
 % --- Executes on button press in pushbutton3.
 function pushbutton3_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton3 (see GCBO)
@@ -204,11 +202,9 @@ function pushbutton4_Callback(hObject, eventdata, handles)
     set(handles.edit11, 'String','');
     set(handles.edit12, 'String','');
     set(handles.edit13, 'String','');
-    
     set(handles.edit1, 'String','');
     set(handles.edit9, 'String','');
-    set(handles.edit10, 'String','');
-    
+    set(handles.edit10, 'String',''); 
     set(handles.edit2, 'String','');  
 
 
@@ -361,13 +357,28 @@ function slider1_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-    size(handles.axes11)
-    %TODO
-    maxNumberOfImages = 168;
-    set(handleToSlider, 'Min', 1);
-    set(handleToSlider, 'Max', maxNumberOfImages);
-    set(handleToSlider, 'Value', 1);
-    set(handleToSlider, 'SliderStep', [1/maxNumberOfImages , 10/maxNumberOfImages ]);
+    % TODO: SLIDER STILL NOT WORKING!!! peak_finding_map_size and
+    % slider_steps are all wrong
+
+    peak_finding_map_size = size(handles.axes11)
+    slider_min_value = 1;
+    
+    slider_step_size_check = peak_finding_map_size(1) > slider_min_value;
+    z =  get(hObject, 'Value')
+    if slider_step_size_check == 1
+    
+        set(handles.slider1, 'Min', 1);
+        set(handles.slider1, 'Max', peak_finding_map_size(2));
+        set(handles.slider1, 'Value', 1);
+        set(handles.slider1, 'SliderStep', [1/peak_finding_map_size , 10/peak_finding_map_size ]);
+        z =  get(hObject, 'Value')
+    
+    else
+        disp('haha')
+        return
+        
+    end
+        
 
     
 
