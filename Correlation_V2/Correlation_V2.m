@@ -271,7 +271,7 @@ function pushbutton5_Callback(hObject, eventdata, handles)
     global path_storage
     
     [ theta, brange, sigma ] = UserVariableInputSanitization(handles);
-    [sanitized_image_name, sanitized_image_pos] = CheckFileName(handles);
+    [ sanitized_image_name, sanitized_image_pos ] = CheckFileName(handles);
     
     check_input = ~isempty(theta) && ~isempty(brange) && ~isempty(sigma) ...
                   && ~isempty(sanitized_image_pos);
@@ -286,6 +286,10 @@ function pushbutton5_Callback(hObject, eventdata, handles)
         peak_map_of_corr_map = MaxIntensityFinding(corr_map_analyzed);    
         axes(handles.axes11);
         imagesc(peak_map_of_corr_map);
+        
+    else
+        
+        return
         
     end
 
@@ -357,14 +361,15 @@ function slider1_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+    size(handles.axes11)
+    %TODO
+    maxNumberOfImages = 168;
+    set(handleToSlider, 'Min', 1);
+    set(handleToSlider, 'Max', maxNumberOfImages);
+    set(handleToSlider, 'Value', 1);
+    set(handleToSlider, 'SliderStep', [1/maxNumberOfImages , 10/maxNumberOfImages ]);
 
-    slider_max_value = ; % slider_max_value's max size is size of peak finding map
     
-   
-    set(handles.slider1, 'Max', slider_max_value);
-   
-
-    slider_value = get(hObject, 'Value')
 
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
