@@ -279,9 +279,10 @@ function pushbutton5_Callback(hObject, eventdata, handles)
         axes(handles.axes6);           
         imagesc(corr_map_analyzed); 
     
-        peak_map_of_corr_map = MaxIntensityFinding(corr_map_analyzed);    
+        peak_map_of_corr_map = MaxIntensityFinding(corr_map_analyzed); 
         axes(handles.axes11);
         imagesc(peak_map_of_corr_map);
+        CountMax(handles, peak_map_of_corr_map);
         
     else
         
@@ -581,3 +582,23 @@ function pushbutton12_Callback(hObject, eventdata, handles)
 
 
 
+
+
+
+function edit7_Callback(hObject, eventdata, handles)
+% hObject    handle to edit7 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit7 as text
+%        str2double(get(hObject,'String')) returns contents of edit7 as a double
+
+
+
+function edit8_Callback(hObject, eventdata, handles)
+% hObject    handle to edit8 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit8 as text
+%        str2double(get(hObject,'String')) returns contents of edit8 as a double
