@@ -1,3 +1,13 @@
 Updated 7/29/14
 
 Finish Peak Finding Testing, Put Peak Finding Algorithm In GUI. 
+
+Updated 8/22/14
+
+Crop image, make analysis on crop image
+
+over plot found peak on original image
+
+test code to make it commercial
+
+reliability test 
