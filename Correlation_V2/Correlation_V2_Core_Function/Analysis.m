@@ -22,16 +22,16 @@
 %
 %
 
-function corr_res = Analysis(theta_range,brange,sigma, image_path)
-    
-    image_to_be_analyzed = imread(image_path);
-   
-%     I = rgb2gray(image_to_be_analyzed); % Why this???? Ask...
+function corr_res = Analysis(theta_range,brange,sigma, image)
 
-    image_input = single(image_to_be_analyzed);
+    image_input = single(image);
     theta_input = [theta_range(1),theta_range(2),theta_range(3)];
     b_range_input = [brange(1),brange(2),brange(3)];
-
+    
+    h = waitbar(0.5, 'Image loaded, starting correlation and peak analysis');
     corr = correlation_line(image_input, theta_input, b_range_input, sigma);
     corr_res = corr;
+    waitbar(1,h,'Analysis Complete');
+    close(h);
+  
 end

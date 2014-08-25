@@ -49,6 +49,7 @@ function [label_map] = MaxIntensityFinding (correlation_map,dist_input)
            
         end
     end
+    
 
 end
 
