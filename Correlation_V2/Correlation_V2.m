@@ -115,7 +115,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-
 % --- Executes on button press in pushbutton1.
 function pushbutton1_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton1 (see GCBO)
@@ -133,8 +132,7 @@ function pushbutton1_Callback(hObject, eventdata, handles)
      
      % remove the deleted file's path from path storage variable
      new_entries = entries(~cellfun('isempty',entries));
-     path_storage{index_selected} = [];
-        
+     path_storage{index_selected} = [];       
      path_storage = path_storage(~cellfun(@isempty, path_storage));
        
      % update listbox handle
@@ -155,40 +153,30 @@ function pushbutton3_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
     
-    global path_storage;        
-    
+    global path_storage;           
     [image_file_name, image_file_path] = GetAndSetImageFile(handles);
     existing_path_list = path_storage;   
       
     % if path_stroage is empty, set the variable equal to path_storage.
     % Else, concat path_storage file name list with new file name list
     
-    if isempty(path_storage) && ~iscell(image_file_path)
-       
-        image_file_path = {image_file_name};
-        
+    if isempty(path_storage) && ~iscell(image_file_path)       
+        image_file_path = {image_file_name};        
         path_storage = image_file_path;
-        return
-        
+        return       
     end
     
     % GetAndSetImageFile returns the full path of the image
     % file with the image's name inside image_file_name variable if uigetfile is invoked. Thus, we
     % only have to add this path to the path_storage variable. 
     
-    if ~iscell(image_file_path)
-        
-        image_file_path = {image_file_name};
-   
-        new_path_list = horzcat(existing_path_list, image_file_path);
-        
-    else
-        
+    if ~iscell(image_file_path)       
+        image_file_path = {image_file_name};  
+        new_path_list = horzcat(existing_path_list, image_file_path);        
+    else       
        new_path_list = horzcat(existing_path_list, image_file_path);  % file path from uigetdir, 
-                                                                      % which returns a n x m cell with image's file path 
-                                                                      % and name together      
+                                                                      % which returns a n x m cell with image's file path                                                                    % and name together      
     end
-
     path_storage = new_path_list;
 
 
@@ -215,15 +203,11 @@ function listbox1_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
     global path_storage
-
     if isempty(get(handles.listbox1,'string')) 
-              
-        return;
-   
+        return;  
     end        
 
-    [sanitized_image_name, sanitized_image_pos] = CheckFileName(handles);
-    
+    [sanitized_image_name, sanitized_image_pos] = CheckFileName(handles);   
     if ~isempty(sanitized_image_name)
 
         % read image and display image on axes1
@@ -234,16 +218,12 @@ function listbox1_Callback(hObject, eventdata, handles)
         % display crop image dialogue if user click on image
         set(image_to_display_handle, 'ButtonDownFcn',{@CropImage,image_read,handles});
         
-    else 
-        
+    else        
         return
-   
     end
-        
 
 % Hints: contents = cellstr(get(hObject,'String')) returns listbox1 contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from listbox1
-
 
 % --- Executes during object creation, after setting all properties.
 function listbox1_CreateFcn(hObject, eventdata, handles)
@@ -257,15 +237,13 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-
 % --- Executes on button press in pushbutton5.
 function pushbutton5_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton5 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-    global path_storage
-    
+    global path_storage   
     [ theta, brange, sigma ] = UserVariableInputSanitization(handles);
     [ sanitized_image_name, sanitized_image_pos ] = CheckFileName(handles);
     
@@ -273,12 +251,12 @@ function pushbutton5_Callback(hObject, eventdata, handles)
                   && ~isempty(sanitized_image_pos);
    
     if check_input == 1
-    
-        corr_map_analyzed = Analysis(theta, brange, sigma, ...
-                                        path_storage{sanitized_image_pos});
+
+        image_to_be_analyzed = imread(path_storage{sanitized_image_pos});
+        corr_map_analyzed = Analysis(theta, brange, sigma, image_to_be_analyzed);
         axes(handles.axes6);           
         imagesc(corr_map_analyzed); 
-    
+  
         peak_map_of_corr_map = MaxIntensityFinding(corr_map_analyzed); 
         axes(handles.axes11);
         imagesc(peak_map_of_corr_map);
@@ -289,7 +267,7 @@ function pushbutton5_Callback(hObject, eventdata, handles)
         return
         
     end
-
+    
 % --- Executes on button press in pushbutton6.
 function pushbutton6_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton6 (see GCBO)
@@ -297,8 +275,7 @@ function pushbutton6_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
     prompt = ' Please Enter File Name ';
-    saved_file_name = inputdlg(prompt);
-    
+    saved_file_name = inputdlg(prompt);   
     % saved_file_name is a cell string. saved_file_name{1} turns the cell
     % string into a string
     SaveData(saved_file_name{1});
@@ -321,9 +298,10 @@ function pushbutton7_Callback(hObject, eventdata, handles)
         [pathstr, file, ext] = fileparts(path_storage{idx});
         
         if ismember(ext,valid_image_extensions) && (~isempty(theta) ...
-                                   && ~isempty(brange) && ~isempty(sigma))
-          
-            corr_map = Analysis(theta, brange, sigma, path_storage{idx});
+                                   && ~isempty(brange) && ~isempty(sigma))          
+            
+            image_to_be_analyzed = imread(path_storage{idx});
+            corr_map = Analysis(theta, brange, sigma, image_to_be_analyzed);
             peak_map = MaxIntensityFinding(corr_map);
         
             % display image, corr_map, and peak_map on graph
@@ -379,14 +357,9 @@ function slider1_Callback(hObject, eventdata, handles)
         return
         
     end
-        
-
-    
 
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
-
-
 % --- Executes during object creation, after setting all properties.
 function slider1_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to slider1 (see GCBO)
@@ -397,7 +370,6 @@ function slider1_CreateFcn(hObject, eventdata, handles)
 if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor',[.9 .9 .9]);
 end
-
 
 % --- Executes during object creation, after setting all properties.
 function edit7_CreateFcn(hObject, eventdata, handles)
@@ -411,7 +383,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-
 % --- Executes during object creation, after setting all properties.
 function edit8_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to edit8 (see GCBO)
@@ -423,7 +394,6 @@ function edit8_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
 
 % --- Executes during object creation, after setting all properties.
 function edit9_CreateFcn(hObject, eventdata, handles)
@@ -437,9 +407,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-
-
-
 % --- Executes during object creation, after setting all properties.
 function edit10_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to edit10 (see GCBO)
@@ -451,9 +418,6 @@ function edit10_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
-
-
 
 % --- Executes during object creation, after setting all properties.
 function edit11_CreateFcn(hObject, eventdata, handles)
@@ -467,8 +431,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-
-
 % --- Executes during object creation, after setting all properties.
 function edit12_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to edit12 (see GCBO)
@@ -480,8 +442,6 @@ function edit12_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
-
 
 % --- Executes during object creation, after setting all properties.
 function edit13_CreateFcn(hObject, eventdata, handles)
@@ -495,8 +455,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-
-
 function edit1_Callback(hObject, eventdata, handles)
 % hObject    handle to edit1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -504,8 +462,6 @@ function edit1_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of edit1 as text
 %        str2double(get(hObject,'String')) returns contents of edit1 as a double
-
-
 
 function edit9_Callback(hObject, eventdata, handles)
 % hObject    handle to edit9 (see GCBO)
@@ -515,8 +471,6 @@ function edit9_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of edit9 as text
 %        str2double(get(hObject,'String')) returns contents of edit9 as a double
 
-
-
 function edit10_Callback(hObject, eventdata, handles)
 % hObject    handle to edit10 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -524,8 +478,6 @@ function edit10_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of edit10 as text
 %        str2double(get(hObject,'String')) returns contents of edit10 as a double
-
-
 
 function edit11_Callback(hObject, eventdata, handles)
 % hObject    handle to edit11 (see GCBO)
@@ -535,8 +487,6 @@ function edit11_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of edit11 as text
 %        str2double(get(hObject,'String')) returns contents of edit11 as a double
 
-
-
 function edit12_Callback(hObject, eventdata, handles)
 % hObject    handle to edit12 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -544,8 +494,6 @@ function edit12_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of edit12 as text
 %        str2double(get(hObject,'String')) returns contents of edit12 as a double
-
-
 
 function edit13_Callback(hObject, eventdata, handles)
 % hObject    handle to edit13 (see GCBO)
@@ -555,8 +503,6 @@ function edit13_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of edit13 as text
 %        str2double(get(hObject,'String')) returns contents of edit13 as a double
 
-
-
 function edit2_Callback(hObject, eventdata, handles)
 % hObject    handle to edit2 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -565,25 +511,11 @@ function edit2_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of edit2 as text
 %        str2double(get(hObject,'String')) returns contents of edit2 as a double
 
-
 % --- Executes on button press in pushbutton12.
 function pushbutton12_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton12 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    
-    
-
-
-
-
-
-
-
-
-
-
-
 
 function edit7_Callback(hObject, eventdata, handles)
 % hObject    handle to edit7 (see GCBO)
@@ -592,8 +524,6 @@ function edit7_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of edit7 as text
 %        str2double(get(hObject,'String')) returns contents of edit7 as a double
-
-
 
 function edit8_Callback(hObject, eventdata, handles)
 % hObject    handle to edit8 (see GCBO)
