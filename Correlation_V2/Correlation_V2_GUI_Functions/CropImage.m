@@ -3,7 +3,9 @@
 % Description:
 %
 %    This function crops the image to the user's specified dimensions and
-%    outputs the cropped image onto the GUI.
+%    outputs the cropped image onto the GUI. It also asks the user whether
+%    he or she wants to perform peak finding and correlation analysis on
+%    the cropped image
 %
 % Fields:
 %    src:  The handle of the object generating the callback (the source of the event)
@@ -62,8 +64,7 @@ function CropImage(src, evnt,image,handles)
         return;
         
     end
-    
-    
+        
     if ycenter + height > ysize
         errordlg('Your y dimension exceeds image dimension');
         return;
@@ -75,7 +76,6 @@ function CropImage(src, evnt,image,handles)
         return;
         
     end
-    
     
     if mod(height,2) == 1
         if mod(width,2) == 1
@@ -95,4 +95,37 @@ function CropImage(src, evnt,image,handles)
     % make new image as button for user to click on if the user want to
     % crop the image again
     set(new_image_display_handle, 'ButtonDownFcn',{@CropImage,image,handles}); 
+    
+    quest_dlg_prompt = 'Would you like to analyze your cropped image?';
+    
+    button_response = questdlg(quest_dlg_prompt, 'Analyze Dialog', 'Yes', 'No','Cancel','Cancel');
+    
+    if strcmp(button_response, 'Yes') == 1
+            
+        [ theta, brange, sigma ] = UserVariableInputSanitization(handles);
+       
+        check_input = ~isempty(theta) && ~isempty(brange) && ~isempty(sigma);
+        
+        if check_input == 1
+            
+            corr_map_analyzed = Analysis(theta, brange, sigma,  new_image);
+            axes(handles.axes6);
+            imagesc(corr_map_analyzed);
+            
+            peak_map_of_corr_map = MaxIntensityFinding(corr_map_analyzed);
+            axes(handles.axes11);
+            imagesc(peak_map_of_corr_map);
+            CountMax(handles, peak_map_of_corr_map);
+            
+        else
+            
+            return
+            
+        end
+        
+    else 
+       
+        return
+            
+    end
 end
