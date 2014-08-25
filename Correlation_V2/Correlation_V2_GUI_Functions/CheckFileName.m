@@ -22,6 +22,15 @@ function [sanitized_image_name, sanitized_image_pos] = CheckFileName(list_box_ha
     list_of_image_name = get(list_box_handle.listbox1, 'String');
     image_name_pos = get(list_box_handle.listbox1, 'Value');
     
+    if isempty(list_of_image_name)
+        
+        sanitized_image_name = '';
+        sanitized_image_pos = '';        
+        return
+        
+    end
+    
+    
     % get file extension 
     [path_str, name, ext] = fileparts(list_of_image_name{image_name_pos});
     
