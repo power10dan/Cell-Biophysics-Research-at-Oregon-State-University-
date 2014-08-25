@@ -54,6 +54,14 @@ function Correlation_V2_OpeningFcn(hObject, eventdata, handles, varargin)
 %            command line (see VARARGIN)
     
     clearvars -global path_storage
+    slider_min = 1;
+    slider_max = 100; 
+    
+    slider_step(1) = 1/(slider_max-slider_min);
+    slider_step(2) = round(1/(slider_max-slider_min));
+ 
+    set(handles.slider1, 'Min',slider_min ,'Max', slider_max, ...
+        'SliderStep', slider_step, 'Value', 1);
     
 % Choose default command line output for Correlation_V2
 handles.output = hObject;
@@ -257,7 +265,8 @@ function pushbutton5_Callback(hObject, eventdata, handles)
         axes(handles.axes6);           
         imagesc(corr_map_analyzed); 
   
-        peak_map_of_corr_map = MaxIntensityFinding(corr_map_analyzed); 
+        peak_map_of_corr_map = MaxIntensityFinding(corr_map_analyzed);
+
         axes(handles.axes11);
         imagesc(peak_map_of_corr_map);
         CountMax(handles, peak_map_of_corr_map);
@@ -303,7 +312,7 @@ function pushbutton7_Callback(hObject, eventdata, handles)
             image_to_be_analyzed = imread(path_storage{idx});
             corr_map = Analysis(theta, brange, sigma, image_to_be_analyzed);
             peak_map = MaxIntensityFinding(corr_map);
-        
+                   
             % display image, corr_map, and peak_map on graph
             exp_image = imread(path_storage{idx});
             axes(handles.axes10);
@@ -338,25 +347,11 @@ function slider1_Callback(hObject, eventdata, handles)
 
     % TODO: SLIDER STILL NOT WORKING!!! peak_finding_map_size and
     % slider_steps are all wrong
-
-    peak_finding_map_size = size(handles.axes11)
-    slider_min_value = 1;
-    
-    slider_step_size_check = peak_finding_map_size(1) > slider_min_value;
-    z =  get(hObject, 'Value')
-    if slider_step_size_check == 1
-    
-        set(handles.slider1, 'Min', 1);
-        set(handles.slider1, 'Max', peak_finding_map_size(2));
-        set(handles.slider1, 'Value', 1);
-        set(handles.slider1, 'SliderStep', [1/peak_finding_map_size , 10/peak_finding_map_size ]);
-        z =  get(hObject, 'Value')
-    
-    else
-        disp('haha')
-        return
+   
         
-    end
+    slider_value = get(hObject, 'Value');
+    set(handles.edit7, 'String', slider_value);
+       
 
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
