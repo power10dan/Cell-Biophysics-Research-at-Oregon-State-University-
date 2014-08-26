@@ -43,7 +43,6 @@ else
 end
 % End initialization code - DO NOT EDIT
 
-
 % --- Executes just before Correlation_V2 is made visible.
 function Correlation_V2_OpeningFcn(hObject, eventdata, handles, varargin)
 % This function has no output args, see OutputFcn.
@@ -58,7 +57,7 @@ function Correlation_V2_OpeningFcn(hObject, eventdata, handles, varargin)
     slider_max = 100; 
     
     slider_step(1) = 1/(slider_max-slider_min);
-    slider_step(2) = round(1/(slider_max-slider_min));
+    slider_step(2) = 1/(slider_max-slider_min);
  
     set(handles.slider1, 'Min',slider_min ,'Max', slider_max, ...
         'SliderStep', slider_step, 'Value', 1);
@@ -83,8 +82,6 @@ function varargout = Correlation_V2_OutputFcn(hObject, eventdata, handles)
 % Get default command line output from handles structure
 varargout{1} = handles.output;
 
-
-
 % --- Executes during object creation, after setting all properties.
 function edit1_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to edit1 (see GCBO)
@@ -97,7 +94,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-
 % --- Executes during object creation, after setting all properties.
 function edit2_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to edit2 (see GCBO)
@@ -109,7 +105,6 @@ function edit2_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
 
 % --- Executes during object creation, after setting all properties.
 function edit3_CreateFcn(hObject, eventdata, handles)
@@ -182,8 +177,8 @@ function pushbutton3_Callback(hObject, eventdata, handles)
         image_file_path = {image_file_name};  
         new_path_list = horzcat(existing_path_list, image_file_path);        
     else       
-       new_path_list = horzcat(existing_path_list, image_file_path);  % file path from uigetdir, 
-                                                                      % which returns a n x m cell with image's file path                                                                    % and name together      
+        new_path_list = horzcat(existing_path_list, image_file_path);  % file path from uigetdir, 
+                                                                       % which returns a n x m cell with image's file path                                                                    % and name together      
     end
     path_storage = new_path_list;
 
@@ -195,14 +190,13 @@ function pushbutton4_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
    
     % clear all list boxes
-    set(handles.edit11, 'String','');
-    set(handles.edit12, 'String','');
-    set(handles.edit13, 'String','');
+    set(handles.edit11,'String','');
+    set(handles.edit12,'String','');
+    set(handles.edit13,'String','');
     set(handles.edit1, 'String','');
     set(handles.edit9, 'String','');
-    set(handles.edit10, 'String',''); 
+    set(handles.edit10,'String',''); 
     set(handles.edit2, 'String','');  
-
 
 % --- Executes on selection change in listbox1.
 function listbox1_Callback(hObject, eventdata, handles)
@@ -283,7 +277,7 @@ function pushbutton6_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-    prompt = ' Please Enter File Name ';
+    prompt = ' What would you like to save your file as? ';
     saved_file_name = inputdlg(prompt);   
     % saved_file_name is a cell string. saved_file_name{1} turns the cell
     % string into a string
@@ -345,11 +339,7 @@ function slider1_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-    % TODO: SLIDER STILL NOT WORKING!!! peak_finding_map_size and
-    % slider_steps are all wrong
-   
-        
-    slider_value = get(hObject, 'Value');
+    slider_value = round(get(hObject, 'Value'));
     set(handles.edit7, 'String', slider_value);
        
 
