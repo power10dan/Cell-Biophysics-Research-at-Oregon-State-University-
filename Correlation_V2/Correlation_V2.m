@@ -53,8 +53,8 @@ function Correlation_V2_OpeningFcn(hObject, eventdata, handles, varargin)
 %            command line (see VARARGIN)
     
     clearvars -global path_storage
-    slider_min = 1;
-    slider_max = 100; 
+    slider_min = 0;
+    slider_max = 1; % place holder 
     
     slider_step(1) = 1/(slider_max-slider_min);
     slider_step(2) = 1/(slider_max-slider_min);
@@ -339,10 +339,29 @@ function slider1_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-    slider_value = round(get(hObject, 'Value'));
-    set(handles.edit7, 'String', slider_value);
+    % get size of the current peak map
+    axes_size = size(getimage(handles.axes11));
+      
+    if any(axes_size) == 1 % if the size is non-zero
+                
+        % reset slider step
+        slider_min = get(hObject, 'Min');
+        slider_max = get(hObject, 'Max');
+        slider_step(1) = 1/(slider_max-slider_min);
+        slider_step(2) = 1/(slider_max-slider_min);
+        set(handles.slider1, 'Max', axes_size(2), 'SliderStep', slider_step);
+                
+        % get slider value and set it to edit box 7
+        slider_value = round(get(hObject, 'Value'));
+        set(handles.edit7, 'String', slider_value);
+    
+    else     
+        
+        slider_value = round(get(hObject, 'Value'));
+        set(handles.edit7, 'String', slider_value);
+        
+    end
        
-
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
 % --- Executes during object creation, after setting all properties.
