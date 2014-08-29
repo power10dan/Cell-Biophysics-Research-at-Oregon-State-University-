@@ -54,7 +54,7 @@ function Correlation_V2_OpeningFcn(hObject, eventdata, handles, varargin)
     
     clearvars -global path_storage
     slider_min = 0;
-    slider_max = 1; % place holder 
+    slider_max = 10; % place holder slider value
     
     slider_step(1) = 1/(slider_max-slider_min);
     slider_step(2) = 1/(slider_max-slider_min);
@@ -265,6 +265,11 @@ function pushbutton5_Callback(hObject, eventdata, handles)
         imagesc(peak_map_of_corr_map);
         CountMax(handles, peak_map_of_corr_map);
         
+        % reset edit box and slider values to readjust to the change in
+        % peak map size
+        set(handles.slider1, 'Value',0);
+        set(handles.edit7, 'String',0);
+  
     else
         
         return
