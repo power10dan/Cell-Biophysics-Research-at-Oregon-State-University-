@@ -525,7 +525,13 @@ function pushbutton12_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton12 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+    
+    corr_image = getimage(handles.axes6);
+    dist_threshold_user_input = str2num(get(handles.edit7, 'String')); 
+    new_peak_map = MaxIntensityFinding(corr_image, dist_threshold_user_input);   
+    axes(handles.axes11);
+    imagesc(new_peak_map);
+        
 function edit7_Callback(hObject, eventdata, handles)
 % hObject    handle to edit7 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
