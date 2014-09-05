@@ -306,7 +306,7 @@ function pushbutton7_Callback(hObject, eventdata, handles)
         [pathstr, file, ext] = fileparts(path_storage{idx});
         
         if ismember(ext,valid_image_extensions) && (~isempty(theta) ...
-                                   && ~isempty(brange) && ~isempty(sigma))          
+                    && ~isempty(brange) && ~isempty(sigma))          
             
             image_to_be_analyzed = imread(path_storage{idx});
             corr_map = Analysis(theta, brange, sigma, image_to_be_analyzed);
@@ -547,3 +547,40 @@ function edit8_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of edit8 as text
 %        str2double(get(hObject,'String')) returns contents of edit8 as a double
+
+function edit15_Callback(hObject, eventdata, handles)
+% hObject    handle to edit15 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+    
+
+% Hints: get(hObject,'String') returns contents of edit15 as text
+%        str2double(get(hObject,'String')) returns contents of edit15 as a double
+
+% --- Executes during object creation, after setting all properties.
+function edit15_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit15 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in pushbutton13.
+function pushbutton13_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton13 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+    threshold_value = str2num(get(handles.edit15,'String'));
+    corr_map = getimage(handles.axes6);
+    
+    % set map value under threshold value to zero 
+    
+    corr_map(corr_map < threshold_value) = 0;
+    axes(handles.axes6);
+    imagesc(corr_map);   
