@@ -16,7 +16,7 @@ Updated 8/29/14
 
 Threshold image ( correlation map value under 1*x, where x is a user specified threshold, must be set to zero)
 
-Sub-window analysis program integration ( Still waiting for supervisor to provide the sub-window program)
+Sub-window analysis program integration
 
 Over-plot peak map values to real image 
 
