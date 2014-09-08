@@ -53,14 +53,15 @@ function Correlation_V2_OpeningFcn(hObject, eventdata, handles, varargin)
 %            command line (see VARARGIN)
     
     clearvars -global path_storage
-    slider_min = 0;
+    slider_min = 2;
     slider_max = 10; % place holder slider value
     
     slider_step(1) = 1/(slider_max-slider_min);
     slider_step(2) = 1/(slider_max-slider_min);
  
     set(handles.slider1, 'Min',slider_min ,'Max', slider_max, ...
-        'SliderStep', slider_step, 'Value', 1);
+        'SliderStep', slider_step, 'Value', 2);
+    set(handles.edit7, 'String',2);
     
 % Choose default command line output for Correlation_V2
 handles.output = hObject;
@@ -205,6 +206,7 @@ function listbox1_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
     global path_storage
+    
     if isempty(get(handles.listbox1,'string')) 
         return;  
     end        
@@ -267,8 +269,8 @@ function pushbutton5_Callback(hObject, eventdata, handles)
         
         % reset edit box and slider values to readjust to the change in
         % peak map size
-        set(handles.slider1, 'Value',0);
-        set(handles.edit7, 'String',0);
+        set(handles.slider1, 'Value',2);
+        set(handles.edit7, 'String',2);
   
     else
         
@@ -528,7 +530,8 @@ function pushbutton12_Callback(hObject, eventdata, handles)
     
     corr_image = getimage(handles.axes6);
     dist_threshold_user_input = str2num(get(handles.edit7, 'String')); 
-    new_peak_map = MaxIntensityFinding(corr_image, dist_threshold_user_input);   
+    new_peak_map = MaxIntensityFinding(corr_image, dist_threshold_user_input); 
+    CountMax(handles,new_peak_map);
     axes(handles.axes11);
     imagesc(new_peak_map);
         
