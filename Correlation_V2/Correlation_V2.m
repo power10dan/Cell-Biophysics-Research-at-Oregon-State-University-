@@ -209,13 +209,13 @@ function pushbutton5_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton5 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
     global path_storage   
     [ theta, brange, sigma ] = UserVariableInputSanitization(handles);
     [ sanitized_image_name, sanitized_image_pos ] = CheckFileName(handles);
     
     check_input = ~isempty(theta) && ~isempty(brange) && ~isempty(sigma) ...
                   && ~isempty(sanitized_image_pos);  
+   
     if check_input == 1
         image_to_be_analyzed = imread(path_storage{sanitized_image_pos});
         corr_map_analyzed = Analysis(theta, brange, sigma, image_to_be_analyzed);
