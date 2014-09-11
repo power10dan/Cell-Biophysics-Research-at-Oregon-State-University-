@@ -11,22 +11,15 @@
 %
 % Final conditions:   none 
 %   
-function PlotPeakOnImage(handles, num_peaks)
-
+function PlotPeakOnImage(handles)
     peak_image = getimage(handles.axes11);
     original_image = getimage(handles.axes10);
-    
-    CountMax()
-    
-
-    
-
-
-
-
-
-
-
-
-end
+    % change peak map matrix indices to Cartesian coordinates
+    [xcord,ycord] = ind2sub(size(peak_image), find(peak_image == 1));
+    % plot the peaks onto the original image
+	axes(handles.axes10);
+	for idx = 1:numel([xcord,ycord])
+		plot(xcord,ycord,'r+');   
+    end     
+ end
 
