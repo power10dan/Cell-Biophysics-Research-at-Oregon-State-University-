@@ -16,40 +16,27 @@
 % Post-Condition: an intensity map showing where the maximums are on the
 % correlation map. 
 
-function [label_map] = MaxIntensityFinding (correlation_map,dist_input)
+function [label_map] = MaxIntensityFinding (correlation_map,dist_input)   
+    if(nargin == 2)      
+        distance_threshold = dist_input;   
+    else    
+        distance_threshold = 10;  % default value if user didn't input anything for dist_input   
+    end    
     
-    if(nargin == 2)
-        
-        distance_threshold = dist_input;
-    
-    else
-        
-        distance_threshold = 10;  % default value if user didn't input anything for dist_input
-    
-    end
-    
-    size_corr = size(correlation_map);
- 
-    label_map = zeros(size_corr);
-    
-    [xgrid,ygrid] = meshgrid(1:size_corr(2),1:size_corr(1));
-    
-    for indx = 1:size_corr(2)
-        
-        for indy = 1:size_corr(1)
-            
+    size_corr = size(correlation_map); 
+    label_map = zeros(size_corr);   
+    [xgrid,ygrid] = meshgrid(1:size_corr(2),1:size_corr(1));   
+    for indx = 1:size_corr(2)       
+        for indy = 1:size_corr(1)           
             dist = sqrt((xgrid-indx).^2 + (ygrid-indy).^2);
-            pixuseful = dist < distance_threshold;
-                
+            pixuseful = dist < distance_threshold;                
             if (correlation_map(indy,indx) >= max(correlation_map(pixuseful)))
-               
-                label_map(indy,indx) = 1;
-            
-            end
-           
+                label_map(indy,indx) = 1;            
+            end           
         end
-    end
-    
-
+    end  
+    %label_map(correlation_map<0.1*max(correlation_map(:)));
+	%filter out false peaks
+    label_map(correlation_map == 0) = 0;
 end
 
