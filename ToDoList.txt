@@ -21,3 +21,8 @@ Sub-window analysis program integration
 Over-plot peak map values to real image 
 
 Continue testing code 
+
+Updated 9/12/14
+
+Make threshold 80 percent of maximum value in correlation map 
+
