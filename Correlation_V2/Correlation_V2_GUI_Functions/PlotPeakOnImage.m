@@ -18,38 +18,18 @@ function PlotPeakOnImage(handles)
     [angle,trans_range] = ind2sub(size(peak_image), find(peak_image == 1));
     % use angle and trans_range to generate line and plot on the original
     % image
-    for idx = 1:numel([angle, trans_range])       
-        [x0, y0] = DetermineOrigin;
-        x1 = x0 +  trans_range(idx) * cos(angle(idx));
-        y1 = y0 +  trans_range(idx) * sin(angle(idx));
-        
-        
-    
-    
+    for idx = 1:numel([angle, trans_range]) 
+		% set origin of the line to be zero 
+        x_cord_point = trans_range(idx) * cos(angle(idx));
+        y_cord_point = trans_range(idx) * sin(angle(idx));	
+		% plot the peaks onto the original image
+		axes(handles.axes10);
+		% convert image to grayscale for better visualization of plotted line 
+		peak_image_gray_scale = rgb2gray(peak_image);
+		hold on;
+		plot(x_cord_point,y_cord_point,'r+','markers',12,'LineWidth',2,'MarkerEdgeColor','k');   
+	    hold off;   
     end
-    
- 
-    
-%     % plot the peaks onto the original image
-% 	axes(handles.axes10);
-% 	hold on;
-% 	for idx = 1:numel([xcord,ycord])
-% 		plot(xcord,ycord,'r+','markers',12,'LineWidth',2,'MarkerEdgeColor','k');   
-%     end  
-%     hold off;
  end
 
- function [xorigin,yorigin] = DetermineOrigin
  
-    
- 
-    
- 
- 
- 
- 
- 
- 
- 
- 
- end
