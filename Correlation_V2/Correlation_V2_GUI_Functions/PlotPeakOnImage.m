@@ -16,18 +16,19 @@ function PlotPeakOnImage(handles)
     original_image = getimage(handles.axes10);
     % change peak map matrix indices to Cartesian coordinates
     [angle,trans_range] = ind2sub(size(peak_image), find(peak_image == 1));
+    % convert image to grayscale for better visualization of plotted line 
+    axes(handles.axes10);
+	original_image_gray_scale = rgb2gray(original_image);
+    imagesc(original_image_gray_scale);
     % use angle and trans_range to generate line and plot on the original
-    % image
+    % image    
     for idx = 1:numel([angle, trans_range]) 
 		% set origin of the line to be zero 
-        x_cord_point = trans_range(idx) * cos(angle(idx));
-        y_cord_point = trans_range(idx) * sin(angle(idx));	
+        x_cord = trans_range(idx) * cos(angle(idx));
+        y_cord = trans_range(idx) * sin(angle(idx));	
 		% plot the peaks onto the original image
-		axes(handles.axes10);
-		% convert image to grayscale for better visualization of plotted line 
-		peak_image_gray_scale = rgb2gray(peak_image);
 		hold on;
-		plot(x_cord_point,y_cord_point,'r+','markers',12,'LineWidth',2,'MarkerEdgeColor','k');   
+		plot(x_cord,y_cord,'r+','markers',12,'LineWidth',2,'MarkerEdgeColor','k');   
 	    hold off;   
     end
  end
