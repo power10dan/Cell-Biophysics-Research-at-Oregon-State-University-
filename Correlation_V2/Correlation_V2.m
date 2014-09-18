@@ -151,7 +151,8 @@ function pushbutton3_Callback(hObject, eventdata, handles)
         new_path_list = horzcat(existing_path_list, image_file_path);        
     else       
         new_path_list = horzcat(existing_path_list, image_file_path);  % file path from uigetdir, 
-                                                                       % which returns a n x m cell with image's file path                                                                    % and name together      
+                                                                       % which returns a n x m cell with image's file path                                                                   
+																	   % and name together      
     end
     path_storage = new_path_list;
 
@@ -168,14 +169,13 @@ function pushbutton4_Callback(hObject, eventdata, handles)
     set(handles.edit9, 'String','');
     set(handles.edit10,'String',''); 
     set(handles.edit2, 'String',''); 
-    set(handles.edit15, 'String','');
+
 
 % --- Executes on selection change in listbox1.
 function listbox1_Callback(hObject, eventdata, handles)
 % hObject    handle to listbox1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
     global path_storage   
     if isempty(get(handles.listbox1,'string')) 
         return;  
@@ -210,12 +210,11 @@ function pushbutton5_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
     global path_storage   
-    [ theta, brange, sigma ] = UserVariableInputSanitization(handles);
+    [ theta, brange, sigma ] = UserVariableInputSanitization(handles)
     [ sanitized_image_name, sanitized_image_pos ] = CheckFileName(handles);
     
     check_input = ~isempty(theta) && ~isempty(brange) && ~isempty(sigma) ...
-                  && ~isempty(sanitized_image_pos);  
-   
+                  && ~isempty(sanitized_image_pos);   
     if check_input == 1
         image_to_be_analyzed = imread(path_storage{sanitized_image_pos});
         corr_map_analyzed = Analysis(theta, brange, sigma, image_to_be_analyzed);
@@ -223,8 +222,9 @@ function pushbutton5_Callback(hObject, eventdata, handles)
         imagesc(corr_map_analyzed);  
         peak_map_of_corr_map = MaxIntensityFinding(corr_map_analyzed);
         axes(handles.axes11);
-        imagesc(peak_map_of_corr_map);
-        CountMax(handles, peak_map_of_corr_map);       
+        imagesc(peak_map_of_corr_map);  
+        CountMax(handles, peak_map_of_corr_map); 
+		PlotPeakOnImage(handles);	
         % reset edit box and slider values to readjust to the change in
         % peak map size
         set(handles.slider1, 'Value',2);
@@ -265,7 +265,9 @@ function pushbutton7_Callback(hObject, eventdata, handles)
             axes(handles.axes6);           
             imagesc(corr_map);            
             axes(handles.axes11);
-            imagesc(peak_map);        
+            imagesc(peak_map);
+			CountMax(handles, peak_map);
+			PlotPeakOnImage(handles);	
             % save data 
             experiment_name = sprintf('experiment_number_%d',idx);
             SaveData(experiment_name);               
@@ -415,6 +417,7 @@ function pushbutton12_Callback(hObject, eventdata, handles)
     CountMax(handles,new_peak_map);
     axes(handles.axes11);
     imagesc(new_peak_map);
+    PlotPeakOnImage(handles);
         
 function edit7_Callback(hObject, eventdata, handles)
 % hObject    handle to edit7 (see GCBO)
@@ -444,13 +447,11 @@ function pushbutton13_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton13 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    threshold_value = str2num(get(handles.edit15,'String'));
-    corr_map = getimage(handles.axes6);   
-    if isempty(threshold_value) || isempty(corr_map)
-        errordlg('Unable to perform threshold analysis');
-        return 
-    end  
+    corr_map = getimage(handles.axes6);  
+    % find the maximum value of the corr_map 
+    max_values_at_eath_column_of_corr_map = max(corr_map,[],1);
+    max_absolute = max(max_values_at_eath_column_of_corr_map);
     % set map value under threshold value to zero
-    corr_map(corr_map < threshold_value) = 0;
+    corr_map(corr_map < (0.8*max_absolute)) = 0;
     axes(handles.axes6);
     imagesc(corr_map);   
