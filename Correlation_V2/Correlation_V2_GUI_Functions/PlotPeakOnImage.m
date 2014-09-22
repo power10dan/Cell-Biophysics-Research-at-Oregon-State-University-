@@ -25,8 +25,8 @@ function PlotPeakOnImage(handles)
         line_img = fuzzyline_gen(sz_original_img(1), sz_original_img(2),...
                                  angle(idx), trans_range(idx), ...
                                  str2num(get(handles.edit2, 'String')));       
-        origin_image_fused = imfuse(line_img, original_image);
-        imagesc(origin_image_fused);
+        original_image(line_img > 0) = 255;
+        imagesc(original_image);
     end
  end
 
