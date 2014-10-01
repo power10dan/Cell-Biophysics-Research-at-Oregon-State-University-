@@ -34,3 +34,11 @@ Do Subwindow analysis port like PIV lab
 
 Imfuse function on image OK, since in a 8x8 image, we are only expecting there to be one line 
 
+Updated 10/1/14
+
+Button to switch modes 
+
+
+
+
+
