@@ -207,13 +207,15 @@ function pushbutton5_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton5 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    global path_storage   
+    global path_storage 
+    global struct_mode_of_operation;
     [ theta, brange, sigma ] = UserVariableInputSanitization(handles);
     [ sanitized_image_name, sanitized_image_pos ] = CheckFileName(handles);
     
     check_input = ~isempty(theta) && ~isempty(brange) && ~isempty(sigma) ...
                   && ~isempty(sanitized_image_pos);   
     if check_input == 1
+        mode_op = CheckStructMode(struct_mode_of_operation);
         image_to_be_analyzed = imread(path_storage{sanitized_image_pos});
         corr_map_analyzed = Analysis(theta, brange, sigma, image_to_be_analyzed);
         axes(handles.axes6);           
@@ -430,17 +432,33 @@ function pushbutton13_Callback(hObject, eventdata, handles)
     corr_map(corr_map < (0.8*max_absolute)) = 0;
     axes(handles.axes6);
     imagesc(corr_map);   
-
+ 
+ function StructModeSetting(mode_cmd)      
+    global struct_mode_of_operation;
+    % init struct modes
+    struct_mode_of_operation.mode_name = 'Sub-window-analysis';
+    struct_mode_of_operation.mode = 0;
+    struct_mode_of_operation(2).mode_name = 'Corr_analysis';
+    struct_mode_of_operation(2).mode = 0;     
+    % compare modes 
+    if strcmp(mode_cmd, 'Correlation_Analysis') == 0       
+           struct_mode_of_operation(1).mode = 0; 
+           struct_mode_of_operation(2).mode = 1;
+    else 
+           struct_mode_of_operation(2) = 0;
+           struct_mode_of_operation(1) = 1;
+    end
 
 % --- Executes on button press in pushbutton14.
 function pushbutton14_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton14 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+StructModeSetting('Correlation_Analysis');
 
 % --- Executes on button press in pushbutton15.
 function pushbutton15_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton15 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+ StructModeSetting('Sub-window-analysis');
