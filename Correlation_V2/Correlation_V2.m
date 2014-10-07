@@ -51,6 +51,7 @@ function Correlation_V2_OpeningFcn(hObject, eventdata, handles, varargin)
 % varargin   unrecognized PropertyName/PropertyValue pairs from the
 %            command line (see VARARGIN)  
     clearvars -global path_storage
+    clearvars -global struct_mode_of_operation
     slider_min = 2;
     slider_max = 10; % place holder slider value    
     slider_step(1) = 1/(slider_max-slider_min);
@@ -211,13 +212,13 @@ function pushbutton5_Callback(hObject, eventdata, handles)
     global struct_mode_of_operation;
     [ theta, brange, sigma ] = UserVariableInputSanitization(handles);
     [ sanitized_image_name, sanitized_image_pos ] = CheckFileName(handles);
-    
+    % boolean to check user input
     check_input = ~isempty(theta) && ~isempty(brange) && ~isempty(sigma) ...
                   && ~isempty(sanitized_image_pos);   
     if check_input == 1
         mode_op = CheckStructMode(struct_mode_of_operation);
         image_to_be_analyzed = imread(path_storage{sanitized_image_pos});
-        corr_map_analyzed = Analysis(theta, brange, sigma, image_to_be_analyzed);
+        corr_map_analyzed = Analysis(mode_op, theta, brange, sigma, image_to_be_analyzed);
         axes(handles.axes6);           
         imagesc(corr_map_analyzed);  
         peak_map_of_corr_map = MaxIntensityFinding(corr_map_analyzed);
@@ -251,12 +252,13 @@ function pushbutton7_Callback(hObject, eventdata, handles)
     [ theta, brange, sigma ] = UserVariableInputSanitization(handles);    
     % File name can be anything, but format must be jpg, tif, tiff, or png 
     valid_image_extensions = {'.jpg', '.png', '.tif', '.tiff'};    
+    mode_op = CheckStructMode(struct_mode_of_operation);
     for idx = 1:numel(path_storage)            
         [pathstr, file, ext] = fileparts(path_storage{idx});       
         if ismember(ext,valid_image_extensions) && (~isempty(theta) ...
                     && ~isempty(brange) && ~isempty(sigma))                     
             image_to_be_analyzed = imread(path_storage{idx});
-            corr_map = Analysis(theta, brange, sigma, image_to_be_analyzed);
+            corr_map = Analysis(mode_op, theta, brange, sigma, image_to_be_analyzed);
             peak_map = MaxIntensityFinding(corr_map);
             % display image, corr_map, and peak_map on graph
             exp_image = imread(path_storage{idx});
@@ -434,19 +436,21 @@ function pushbutton13_Callback(hObject, eventdata, handles)
     imagesc(corr_map);   
  
  function StructModeSetting(mode_cmd)      
-    global struct_mode_of_operation;
+    global struct_mode_of_operation;  
     % init struct modes
-    struct_mode_of_operation.mode_name = 'Sub-window-analysis';
-    struct_mode_of_operation.mode = 0;
-    struct_mode_of_operation(2).mode_name = 'Corr_analysis';
-    struct_mode_of_operation(2).mode = 0;     
+    struct_mode_name_corr = 'Correlation_Analysis';
+    struct_mode_name_sub = 'Sub_window_Analysis';
+    mode_op_corr_analysis = 0;
+    mode_op_sub_window = 0;  
+    struct_mode_of_operation = struct(struct_mode_name_corr, mode_op_corr_analysis, ...
+                                      struct_mode_name_sub, mode_op_sub_window);
     % compare modes 
     if strcmp(mode_cmd, 'Correlation_Analysis') == 0       
-           struct_mode_of_operation(1).mode = 0; 
-           struct_mode_of_operation(2).mode = 1;
+        struct_mode_of_operation.Correlation_Analysis = 1;
+        struct_mode_of_operation.Sub_window_Analysis = 0;
     else 
-           struct_mode_of_operation(2) = 0;
-           struct_mode_of_operation(1) = 1;
+        struct_mode_of_operation.Correlation_Analysis = 0;
+        struct_mode_of_operation.Sub_window_Analysis = 1;
     end
 
 % --- Executes on button press in pushbutton14.
@@ -454,11 +458,12 @@ function pushbutton14_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton14 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-StructModeSetting('Correlation_Analysis');
+ StructModeSetting('Sub_window_Analysis');
 
 % --- Executes on button press in pushbutton15.
 function pushbutton15_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton15 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
- StructModeSetting('Sub-window-analysis');
+StructModeSetting('Correlation_Analysis');
+
