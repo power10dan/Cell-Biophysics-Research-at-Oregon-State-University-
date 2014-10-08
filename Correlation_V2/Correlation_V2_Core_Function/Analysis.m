@@ -21,19 +21,21 @@
 % Final conditions:
 %      Returns a correlation analysis map
 %
-function corr_res = Analysis(mode,theta_range,brange,sigma, image)
+function [corr_res, nematic_graph] = Analysis(mode,theta_range,brange,sigma, image)
     [image_input, theta_input, b_range_input] = ImageAnaylsisHelper(image, theta_range, brange);
     % default sub-image-size, subject to change
-    subimgsz = [8, 8];
     if strcmp(mode, 'Regular-Corr-Analysis') == 1
         h = waitbar(0.5, 'Image loaded, performing correlation and peak finding now');
         corr = correlation_line(image_input, theta_input, b_range_input, sigma);
         corr_res = corr;
+        nematic_graph = '';
     else
+        %TODO : Pop up window for input sw analysis parameter for threshold
+        %whole image and 2 local 
         h = waitbar(0.5, 'Image loaded, performing correlation sub-window analysis');
-        [corr,spcorr,angles,trans,refline,colsubimgs] = correlation_line_sw(image_input, ...
-                                                        subimgsz, theta_input, b_range_input, sigma);
+        [origrid,absgrid,corr,nematicgraph,colsubimgs]=fiberorientation(imagenow,pars);
         corr_res = corr;
+        nematic_graph = nematicgraph;
     end
     waitbar(1,h,'Analysis Complete');
     pause(0.3); % let the user see the analysis complete message
@@ -42,6 +44,7 @@ end
 
 function [image_output, theta_input, b_range_input] = ImageAnaylsisHelper(image_to_be_analyzed, theta, brange)
     image_output = single(image_to_be_analyzed);
+    % TODO: check if its gray or rgb
     image_output = rgb2gray(image_output);
     theta_input = [theta(1),theta(2),theta(3)];
     b_range_input = [brange(1),brange(2),brange(3)];
