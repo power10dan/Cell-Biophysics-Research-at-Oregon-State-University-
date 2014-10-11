@@ -59,6 +59,14 @@ function Correlation_V2_OpeningFcn(hObject, eventdata, handles, varargin)
     set(handles.slider1, 'Min',slider_min ,'Max', slider_max, ...
         'SliderStep', slider_step, 'Value', 2);
     set(handles.edit7, 'String',2);
+    global struct_mode_of_operation;  
+    % init struct modes
+    struct_mode_name_corr = 'Correlation_Analysis';
+    struct_mode_name_sub = 'Sub_window_Analysis';
+    mode_op_corr_analysis = 0;
+    mode_op_sub_window = 0;  
+    struct_mode_of_operation = struct(struct_mode_name_corr, mode_op_corr_analysis, ...
+                                      struct_mode_name_sub, mode_op_sub_window);
     
 % Choose default command line output for Correlation_V2
 handles.output = hObject;
@@ -90,7 +98,6 @@ function edit2_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to edit2 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
-
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
@@ -103,6 +110,7 @@ function edit3_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
 % --- Executes on button press in pushbutton1.
 function pushbutton1_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton1 (see GCBO)
@@ -436,14 +444,7 @@ function pushbutton13_Callback(hObject, eventdata, handles)
     imagesc(corr_map);   
  
  function StructModeSetting(mode_cmd)      
-    global struct_mode_of_operation;  
-    % init struct modes
-    struct_mode_name_corr = 'Correlation_Analysis';
-    struct_mode_name_sub = 'Sub_window_Analysis';
-    mode_op_corr_analysis = 0;
-    mode_op_sub_window = 0;  
-    struct_mode_of_operation = struct(struct_mode_name_corr, mode_op_corr_analysis, ...
-                                      struct_mode_name_sub, mode_op_sub_window);
+    global struct_mode_of_operation;
     % compare modes 
     if strcmp(mode_cmd, 'Correlation_Analysis') == 0       
         struct_mode_of_operation.Correlation_Analysis = 1;
@@ -458,16 +459,38 @@ function pushbutton14_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton14 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
- StructModeSetting('Sub_window_Analysis');
+    StructModeSetting('Sub_window_Analysis');
 
 % --- Executes on button press in pushbutton15.
 function pushbutton15_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton15 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-StructModeSetting('Correlation_Analysis');
+    StructModeSetting('Correlation_Analysis');
 % --- Executes on button press in pushbutton16.
 function pushbutton16_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton16 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+    % TODO
+    global struct_mode_of_operation;
+    mode_op = CheckStructMode(struct_mode_of_operation);
+    if strcmp(mode_op, 'Sub-window-Analysis') == 1
+        prompt={'Threshold input for image map:',...
+                'Subwindow Size:', 'Local Cutoff Point:', ...
+                'Global Cutoff', 'Normalize'};
+        name='Additional Parameters For Sub-window Analysis';
+        numlines=1;
+        [response_pars]=inputdlg(prompt,name,numlines);
+        %TODO: Make these Pars structure! 
+        pars_structure = [str2num(response_pars{1}), str2num(response_pars{2}), ... 
+                          str2num(response_pars{3}), str2num(response_pars{4}), str2num(response_pars{5})];
+   
+    else
+        return
+        
+    end
+
+
+
+    
