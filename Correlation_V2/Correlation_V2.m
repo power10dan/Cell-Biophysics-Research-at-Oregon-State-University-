@@ -49,9 +49,12 @@ function Correlation_V2_OpeningFcn(hObject, eventdata, handles, varargin)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   unrecognized PropertyName/PropertyValue pairs from the
-%            command line (see VARARGIN)  
+%            command line (see VARARGIN)    
+    % clear existing persistant data 
     clearvars -global path_storage
     clearvars -global struct_mode_of_operation
+    clearvars -global pars_structure
+    % set slider values
     slider_min = 2;
     slider_max = 10; % place holder slider value    
     slider_step(1) = 1/(slider_max-slider_min);
@@ -59,6 +62,7 @@ function Correlation_V2_OpeningFcn(hObject, eventdata, handles, varargin)
     set(handles.slider1, 'Min',slider_min ,'Max', slider_max, ...
         'SliderStep', slider_step, 'Value', 2);
     set(handles.edit7, 'String',2);
+    % initialize mode of operation struct
     global struct_mode_of_operation;  
     % init struct modes
     struct_mode_name_corr = 'Correlation_Analysis';
@@ -66,8 +70,7 @@ function Correlation_V2_OpeningFcn(hObject, eventdata, handles, varargin)
     mode_op_corr_analysis = 0;
     mode_op_sub_window = 0;  
     struct_mode_of_operation = struct(struct_mode_name_corr, mode_op_corr_analysis, ...
-                                      struct_mode_name_sub, mode_op_sub_window);
-    
+                                      struct_mode_name_sub, mode_op_sub_window);    
 % Choose default command line output for Correlation_V2
 handles.output = hObject;
 % Update handles structure
@@ -218,6 +221,7 @@ function pushbutton5_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
     global path_storage 
     global struct_mode_of_operation;
+    global pars_structure;
     [ theta, brange, sigma ] = UserVariableInputSanitization(handles);
     [ sanitized_image_name, sanitized_image_pos ] = CheckFileName(handles);
     % boolean to check user input
@@ -226,7 +230,7 @@ function pushbutton5_Callback(hObject, eventdata, handles)
     if check_input == 1
         mode_op = CheckStructMode(struct_mode_of_operation);
         image_to_be_analyzed = imread(path_storage{sanitized_image_pos});
-        corr_map_analyzed = Analysis(mode_op, theta, brange, sigma, image_to_be_analyzed);
+        corr_map_analyzed = Analysis(mode_op, theta, brange, sigma, image_to_be_analyzed, pars_structure);
         axes(handles.axes6);           
         imagesc(corr_map_analyzed);  
         peak_map_of_corr_map = MaxIntensityFinding(corr_map_analyzed);
@@ -472,25 +476,25 @@ function pushbutton16_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton16 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    % TODO
     global struct_mode_of_operation;
+    global pars_structure;
     mode_op = CheckStructMode(struct_mode_of_operation);
+    % mode op determines what type of pop up window 
     if strcmp(mode_op, 'Sub-window-Analysis') == 1
-        prompt={'Threshold input for image map:',...
-                'Subwindow Size:', 'Local Cutoff Point:', ...
-                'Global Cutoff', 'Normalize'};
-        name='Additional Parameters For Sub-window Analysis';
-        numlines=1;
-        [response_pars]=inputdlg(prompt,name,numlines);
-        %TODO: Make these Pars structure! 
-        pars_structure = [str2num(response_pars{1}), str2num(response_pars{2}), ... 
-                          str2num(response_pars{3}), str2num(response_pars{4}), str2num(response_pars{5})];
-   
+        prompt ={'Threshold input for image map:',...
+                 'Subwindow Size:', 'Local Cutoff Point:', ...
+                 'Global Cutoff', 'Normalize'};
+        name = 'Additional Parameters For Sub-window Analysis';
+        numlines = 1;
+        response_pars =inputdlg(prompt,name,numlines);
+        pars_structure = struct('subwdsz', str2num(response_pars{1}), ...
+                                'iflocalcutoff', str2num(response_pars{2}), ...
+                                'ifglobalcutoff', str2num(response_pars{3}), ...
+                                'ifnormalize', str2num(response_pars{4}));
     else
-        return
-        
+        prompt = {'Threshold input for image map'};
+        name = 'Additional Parameters For Regular Correlation Analysis';
+        numlines = 1;
+        response_pars = inputdlg(prompt, name, numlines);
+        pars_structure = struct('Threshold', response_pars{1});
     end
-
-
-
-    

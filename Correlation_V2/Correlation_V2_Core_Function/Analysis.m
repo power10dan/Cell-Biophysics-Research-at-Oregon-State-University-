@@ -21,7 +21,7 @@
 % Final conditions:
 %      Returns a correlation analysis map
 %
-function [corr_res, nematic_graph] = Analysis(mode,theta_range,brange,sigma, image)
+function [corr_res, nematic_graph] = Analysis(mode,theta_range,brange,sigma, image, pars_mode)
     [image_input, theta_input, b_range_input] = ImageAnaylsisHelper(image, theta_range, brange);
     % default sub-image-size, subject to change
     if strcmp(mode, 'Regular-Corr-Analysis') == 1
@@ -30,10 +30,8 @@ function [corr_res, nematic_graph] = Analysis(mode,theta_range,brange,sigma, ima
         corr_res = corr;
         nematic_graph = '';
     else
-        %TODO : Pop up window for input sw analysis parameter for threshold
-        %whole image and 2 local 
         h = waitbar(0.5, 'Image loaded, performing correlation sub-window analysis');
-        [origrid,absgrid,corr,nematicgraph,colsubimgs]=fiberorientation(imagenow,pars);
+        [origrid,absgrid,corr,nematicgraph,colsubimgs]= fiberorientation(image_input,pars_mode);
         corr_res = corr;
         nematic_graph = nematicgraph;
     end
