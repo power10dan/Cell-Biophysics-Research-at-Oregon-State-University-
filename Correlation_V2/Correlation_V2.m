@@ -471,6 +471,7 @@ function pushbutton15_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
     StructModeSetting('Correlation_Analysis');
+
 % --- Executes on button press in pushbutton16.
 function pushbutton16_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton16 (see GCBO)
@@ -481,8 +482,7 @@ function pushbutton16_Callback(hObject, eventdata, handles)
     mode_op = CheckStructMode(struct_mode_of_operation);
     % mode op determines what type of pop up window 
     if strcmp(mode_op, 'Sub-window-Analysis') == 1
-        prompt ={'Threshold input for image map:',...
-                 'Subwindow Size:', 'Local Cutoff Point:', ...
+        prompt ={ 'Subwindow Size:', 'Local Cutoff Point:', ...
                  'Global Cutoff', 'Normalize'};
         name = 'Additional Parameters For Sub-window Analysis';
         numlines = 1;
