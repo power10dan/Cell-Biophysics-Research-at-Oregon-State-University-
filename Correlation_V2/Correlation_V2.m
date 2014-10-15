@@ -230,7 +230,8 @@ function pushbutton5_Callback(hObject, eventdata, handles)
     if check_input == 1
         mode_op = CheckStructMode(struct_mode_of_operation);
         image_to_be_analyzed = imread(path_storage{sanitized_image_pos});
-        corr_map_analyzed = Analysis(mode_op, theta, brange, sigma, image_to_be_analyzed, pars_structure);
+        corr_map_analyzed = Analysis(mode_op, theta, brange, sigma, ...
+                            image_to_be_analyzed, pars_structure, handles);
         axes(handles.axes6);           
         imagesc(corr_map_analyzed);  
         peak_map_of_corr_map = MaxIntensityFinding(corr_map_analyzed);
@@ -419,8 +420,7 @@ function edit2_Callback(hObject, eventdata, handles)
 % hObject    handle to edit2 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
-% --- Executes on button press in pushbutton12.
+% --- Executes on button press in pushbutton12
 function pushbutton12_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton12 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -431,22 +431,8 @@ function pushbutton12_Callback(hObject, eventdata, handles)
     CountMax(handles,new_peak_map);
     axes(handles.axes11);
     imagesc(new_peak_map);
-    PlotPeakOnImage(handles);
-        
-% --- Executes on button press in pushbutton13.
-function pushbutton13_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton13 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-    corr_map = getimage(handles.axes6);  
-    % find the maximum value of the corr_map 
-    max_values_at_eath_column_of_corr_map = max(corr_map,[],1);
-    max_absolute = max(max_values_at_eath_column_of_corr_map);
-    % set map value under threshold value to zero
-    corr_map(corr_map < (0.8*max_absolute)) = 0;
-    axes(handles.axes6);
-    imagesc(corr_map);   
- 
+    PlotPeakOnImage(handles);     
+    
  function StructModeSetting(mode_cmd)      
     global struct_mode_of_operation;
     % compare modes 
@@ -457,7 +443,7 @@ function pushbutton13_Callback(hObject, eventdata, handles)
         struct_mode_of_operation.Correlation_Analysis = 0;
         struct_mode_of_operation.Sub_window_Analysis = 1;
     end
-
+    
 % --- Executes on button press in pushbutton14.
 function pushbutton14_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton14 (see GCBO)
@@ -482,7 +468,7 @@ function pushbutton16_Callback(hObject, eventdata, handles)
     mode_op = CheckStructMode(struct_mode_of_operation);
     % mode op determines what type of pop up window 
     if strcmp(mode_op, 'Sub-window-Analysis') == 1
-        prompt ={ 'Subwindow Size:', 'Local Cutoff Point:', ...
+        prompt ={'Subwindow Size:', 'Local Cutoff Point:', ...
                  'Global Cutoff', 'Normalize'};
         name = 'Additional Parameters For Sub-window Analysis';
         numlines = 1;

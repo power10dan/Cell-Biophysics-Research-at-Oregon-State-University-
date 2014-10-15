@@ -21,14 +21,21 @@
 % Final conditions:
 %      Returns a correlation analysis map
 %
-function [corr_res, nematic_graph] = Analysis(mode,theta_range,brange,sigma, image, pars_mode)
+function [corr_res, nematic_graph] = Analysis(mode,theta_range,brange,sigma, image, pars_mode, handles)
     [image_input, theta_input, b_range_input] = ImageAnaylsisHelper(image, theta_range, brange);
     % default sub-image-size, subject to change
     if strcmp(mode, 'Regular-Corr-Analysis') == 1
         h = waitbar(0.5, 'Image loaded, performing correlation and peak finding now');
-        corr = correlation_line(image_input, theta_input, b_range_input, sigma);
-        corr_res = corr;
-        nematic_graph = '';
+        corr = correlation_line(image_input, theta_input, b_range_input, sigma);    
+        if ~isempty(pars_mode.Threshold) 
+            % set map value under threshold value to zero
+             corr(corr < (0.8*str2num(pars_mode.Threshold))) = 0;
+             corr_res = corr;
+             nematic_graph = '';             
+        else
+            corr_res = corr;
+            nematic_graph = '';
+        end
     else
         h = waitbar(0.5, 'Image loaded, performing correlation sub-window analysis');
         [origrid,absgrid,corr,nematicgraph,colsubimgs]= fiberorientation(image_input,pars_mode);
