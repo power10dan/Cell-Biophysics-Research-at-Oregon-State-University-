@@ -231,7 +231,8 @@ function pushbutton5_Callback(hObject, eventdata, handles)
         mode_op = CheckStructMode(struct_mode_of_operation);
         image_to_be_analyzed = imread(path_storage{sanitized_image_pos});
         corr_map_analyzed = Analysis(mode_op, theta, brange, sigma, ...
-                            image_to_be_analyzed, pars_structure, handles);
+                                     image_to_be_analyzed, pars_structure, ...
+                                     handles);
         axes(handles.axes6);           
         imagesc(corr_map_analyzed);  
         peak_map_of_corr_map = MaxIntensityFinding(corr_map_analyzed);
@@ -262,6 +263,8 @@ function pushbutton7_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)    
     global path_storage    
+    global pars_structure;
+    global struct_mode_of_operation;
     [ theta, brange, sigma ] = UserVariableInputSanitization(handles);    
     % File name can be anything, but format must be jpg, tif, tiff, or png 
     valid_image_extensions = {'.jpg', '.png', '.tif', '.tiff'};    
@@ -269,9 +272,11 @@ function pushbutton7_Callback(hObject, eventdata, handles)
     for idx = 1:numel(path_storage)            
         [pathstr, file, ext] = fileparts(path_storage{idx});       
         if ismember(ext,valid_image_extensions) && (~isempty(theta) ...
-                    && ~isempty(brange) && ~isempty(sigma))                     
+                    && ~isempty(brange) && ~isempty(sigma))   
             image_to_be_analyzed = imread(path_storage{idx});
-            corr_map = Analysis(mode_op, theta, brange, sigma, image_to_be_analyzed);
+            corr_map = Analysis(mode_op, theta, brange, sigma, ...
+                                image_to_be_analyzed, pars_structure, ...
+                                handles);
             peak_map = MaxIntensityFinding(corr_map);
             % display image, corr_map, and peak_map on graph
             exp_image = imread(path_storage{idx});
@@ -472,7 +477,10 @@ function pushbutton16_Callback(hObject, eventdata, handles)
                  'Global Cutoff', 'Normalize'};
         name = 'Additional Parameters For Sub-window Analysis';
         numlines = 1;
-        response_pars =inputdlg(prompt,name,numlines);
+        response_pars = inputdlg(prompt,name,numlines);
+        if isempty(response_pars) == 1
+            return
+        end
         pars_structure = struct('subwdsz', str2num(response_pars{1}), ...
                                 'iflocalcutoff', str2num(response_pars{2}), ...
                                 'ifglobalcutoff', str2num(response_pars{3}), ...
@@ -482,5 +490,8 @@ function pushbutton16_Callback(hObject, eventdata, handles)
         name = 'Additional Parameters For Regular Correlation Analysis';
         numlines = 1;
         response_pars = inputdlg(prompt, name, numlines);
+        if isempty(response_pars) == 1
+            return
+        end
         pars_structure = struct('Threshold', response_pars{1});
     end
