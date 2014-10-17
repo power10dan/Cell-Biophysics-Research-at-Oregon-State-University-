@@ -30,6 +30,7 @@ function [corr_res, nematic_graph] = Analysis(mode,theta_range,brange,sigma, ima
         nematic_graph = '';
         return
     end
+    %TODO: HOUGH COLOR SCHEME FOR PLOTTING LINES OF VARIOUS ANGLES
     % default sub-image-size, subject to change
     if strcmp(mode, 'Regular-Corr-Analysis') == 1
         h = waitbar(0.1, 'Image loaded, performing correlation and peak finding now');
@@ -53,20 +54,18 @@ function [corr_res, nematic_graph] = Analysis(mode,theta_range,brange,sigma, ima
         image_input = image_input(1:end1,1:end2);
         
        [origrid,absgrid,corr,nematicgraph,colsubimgs]= fiberorientation(image_input,theta_range, brange, sigma,pars_mode);
-        waitbar(0.25,h,'Analysis complete, patching up data for display');
+        waitbar(0.25,h,'Analysis complete, plotting data');
         corr_res = zeros(size(absgrid));
         for i = 1:length(corr_res(:,1))
             for j = 1:length(corr_res(1,:))
                 corrsubwd =squeeze(corr(:,:,i,j));
                 temp1 = MaxIntensityFinding(corrsubwd, 3);
                 corr_res(i,j) = sum(temp1(:));  
-                waitbar(0.05,h);
             end
         end
-        waitbar(0.75,h,'Data patched, doing last minute clean-up');
         nematic_graph = nematicgraph;
     end
-    waitbar(1,h,'Complete');
+    waitbar(1,h,'Analysis operation Complete ');
     pause(0.3); % let the user see the analysis complete message
     close(h);
 end

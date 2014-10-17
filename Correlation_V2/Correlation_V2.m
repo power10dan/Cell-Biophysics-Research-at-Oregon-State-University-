@@ -231,8 +231,8 @@ function pushbutton5_Callback(hObject, eventdata, handles)
         mode_op = CheckStructMode(struct_mode_of_operation);
         image_to_be_analyzed = imread(path_storage{sanitized_image_pos});
         [corr_map_analyzed, nematic_graph] = Analysis(mode_op, theta, brange, sigma, ...
-                                     image_to_be_analyzed, pars_structure, ...
-                                     handles);
+                                             image_to_be_analyzed, pars_structure, ...
+                                             handles);
         if isempty(corr_map_analyzed) && isempty(nematic_graph)
             return;
         end
@@ -240,7 +240,9 @@ function pushbutton5_Callback(hObject, eventdata, handles)
         imagesc(corr_map_analyzed);  
         peak_map_of_corr_map = MaxIntensityFinding(corr_map_analyzed);
         axes(handles.axes11);
-        imagesc(peak_map_of_corr_map);  
+        imagesc(peak_map_of_corr_map); 
+        %TODO: FIX THIS PART, causing slow down and redundant?
+        
         CountMax(handles, peak_map_of_corr_map); 
 		PlotPeakOnImage(handles);	
         % reset edit box and slider values to readjust to the change in
