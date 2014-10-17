@@ -230,9 +230,12 @@ function pushbutton5_Callback(hObject, eventdata, handles)
     if check_input == 1
         mode_op = CheckStructMode(struct_mode_of_operation);
         image_to_be_analyzed = imread(path_storage{sanitized_image_pos});
-        corr_map_analyzed = Analysis(mode_op, theta, brange, sigma, ...
+        [corr_map_analyzed, nematic_graph] = Analysis(mode_op, theta, brange, sigma, ...
                                      image_to_be_analyzed, pars_structure, ...
                                      handles);
+        if isempty(corr_map_analyzed) && isempty(nematic_graph)
+            return;
+        end
         axes(handles.axes6);           
         imagesc(corr_map_analyzed);  
         peak_map_of_corr_map = MaxIntensityFinding(corr_map_analyzed);
@@ -490,8 +493,5 @@ function pushbutton16_Callback(hObject, eventdata, handles)
         name = 'Additional Parameters For Regular Correlation Analysis';
         numlines = 1;
         response_pars = inputdlg(prompt, name, numlines);
-        if isempty(response_pars) == 1
-            return
-        end
         pars_structure = struct('Threshold', response_pars{1});
     end
