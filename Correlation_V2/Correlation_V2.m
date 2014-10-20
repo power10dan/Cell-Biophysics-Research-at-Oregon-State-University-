@@ -242,13 +242,20 @@ function pushbutton5_Callback(hObject, eventdata, handles)
         axes(handles.axes11);
         imagesc(peak_map_of_corr_map); 
         %TODO: FIX THIS PART, causing slow down and redundant?
+        if strcmp(mode_op, 'Correlation_Analysis') == 1
+            
+            CountMax(handles, peak_map_of_corr_map); 
+            PlotPeakOnImage(handles);	
+           % reset edit box and slider values to readjust to the change in
+            % peak map size
+            set(handles.slider1, 'Value',2);
+            set(handles.edit7, 'String',2);  
+        else 
+            CountMax(handles, peak_map_of_corr_map); 
+            set(handles.slider1, 'Value',2);
+            set(handles.edit7, 'String',2); 
         
-        CountMax(handles, peak_map_of_corr_map); 
-		PlotPeakOnImage(handles);	
-        % reset edit box and slider values to readjust to the change in
-        % peak map size
-        set(handles.slider1, 'Value',2);
-        set(handles.edit7, 'String',2);  
+        end
     else        
         return        
     end   

@@ -62,6 +62,7 @@ function [corr_res, nematic_graph] = Analysis(mode,theta_range,brange,sigma, ima
                 temp1 = MaxIntensityFinding(corrsubwd, 3);
                 corr_res(i,j) = sum(temp1(:));  
             end
+            waitbar(i/length(corr_res(:,1)), h);
         end
         nematic_graph = nematicgraph;
     end
