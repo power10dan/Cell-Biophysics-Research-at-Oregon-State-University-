@@ -21,9 +21,10 @@
 % Final conditions:
 %      Returns a correlation analysis map
 %
-function [corr_res, nematic_graph] = Analysis(mode,theta_range,brange,sigma, image, pars_mode, handles)
-    pars_mode
-    [image_input, theta_input, b_range_input] = ImageAnaylsisHelper(image, theta_range, brange);
+function [corr_res, nematic_graph] = Analysis(mode,theta_range,brange,sigma, ...
+                                              image, pars_mode, handles)
+    [image_input, theta_input, b_range_input] = ImageAnaylsisHelper(image, ...
+                                                      theta_range, brange);
     if isempty(pars_mode)
         errordlg('Please Set Your Additional Parameters');
         corr_res = '';
@@ -38,6 +39,8 @@ function [corr_res, nematic_graph] = Analysis(mode,theta_range,brange,sigma, ima
         waitbar(0.25,h,'analysis complete, patching up data for display');
         if isempty(pars_mode.Threshold) == 0
             % set map value under threshold value to zero
+            % TODO: CHANGE THRESHOLD TO THRESHOLD * MAX(CORR); RELATIVE
+            % THRESHOLD
              corr(corr < (0.8*str2num(pars_mode.Threshold))) = 0;
              corr_res = corr;
              nematic_graph = '';             
@@ -53,9 +56,13 @@ function [corr_res, nematic_graph] = Analysis(mode,theta_range,brange,sigma, ima
         end2 = floor(imagesz(2)/subwdsz(2))*subwdsz(2);
         image_input = image_input(1:end1,1:end2);
         
-       [origrid,absgrid,corr,nematicgraph,colsubimgs]= fiberorientation(image_input,theta_range, brange, sigma,pars_mode);
+       [origrid,absgrid, corr,nematicgraph,colsubimgs]= fiberorientation(image_input, ...
+                                                            theta_range, ...
+                                                            brange,  ...
+                                                            sigma, pars_mode);
         waitbar(0.25,h,'Analysis complete, plotting data');
         corr_res = zeros(size(absgrid));
+        % TODO: TAKE THIS OUT AND MAKE IT A USER SELECTED OPTION BUTTON
         for i = 1:length(corr_res(:,1))
             for j = 1:length(corr_res(1,:))
                 corrsubwd =squeeze(corr(:,:,i,j));
@@ -71,7 +78,9 @@ function [corr_res, nematic_graph] = Analysis(mode,theta_range,brange,sigma, ima
     close(h);
 end
 
-function [image_output, theta_input, b_range_input] = ImageAnaylsisHelper(image_to_be_analyzed, theta, brange)
+function [image_output, theta_input, b_range_input] = ImageAnaylsisHelper( ...
+                                                      image_to_be_analyzed, ...
+                                                      theta, brange)
     image_output = single(image_to_be_analyzed);
     image_output = rgb2gray(image_output);
     theta_input = [theta(1),theta(2),theta(3)];

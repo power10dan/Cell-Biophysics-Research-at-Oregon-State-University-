@@ -229,29 +229,35 @@ function pushbutton5_Callback(hObject, eventdata, handles)
                   && ~isempty(sanitized_image_pos);   
     if check_input == 1
         mode_op = CheckStructMode(struct_mode_of_operation);
-        image_to_be_analyzed = imread(path_storage{sanitized_image_pos});
+        image_to_be_analyzed = imread(path_storage{sanitized_image_pos});         
         [corr_map_analyzed, nematic_graph] = Analysis(mode_op, theta, brange, sigma, ...
                                              image_to_be_analyzed, pars_structure, ...
                                              handles);
         if isempty(corr_map_analyzed) && isempty(nematic_graph)
             return;
-        end
-        axes(handles.axes6);           
-        imagesc(corr_map_analyzed);  
-        peak_map_of_corr_map = MaxIntensityFinding(corr_map_analyzed);
-        axes(handles.axes11);
-        imagesc(peak_map_of_corr_map); 
-        %TODO: FIX THIS PART, causing slow down and redundant?
-        if strcmp(mode_op, 'Correlation_Analysis') == 1
-            
+        end 
+        %TODO: EXAMINE WHY JELLY FISH FOR 0 1 179 DISPLAY GREEN
+        %TODO: THRESHOLD USER INPUT MUST BE CHECKED
+        if strcmp(mode_op, 'Regular-Corr-Analysis') == 1
+            % display correlation map and do peak finding 
+            axes(handles.axes6);           
+            imagesc(corr_map_analyzed); 
+            peak_map_of_corr_map = MaxIntensityFinding(corr_map_analyzed);
+            axes(handles.axes11);
+            imagesc(peak_map_of_corr_map);
             CountMax(handles, peak_map_of_corr_map); 
             PlotPeakOnImage(handles);	
            % reset edit box and slider values to readjust to the change in
             % peak map size
             set(handles.slider1, 'Value',2);
             set(handles.edit7, 'String',2);  
-        else 
-            CountMax(handles, peak_map_of_corr_map); 
+
+        end
+        
+        if strcmp(mode_op, 'Sub-window-Analysis') == 1
+            % display only nematic graph 
+            axes(handles.axes6);
+            imagesc(nematic_graph);
             set(handles.slider1, 'Value',2);
             set(handles.edit7, 'String',2); 
         
@@ -482,6 +488,9 @@ function pushbutton16_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
     global struct_mode_of_operation;
     global pars_structure;
+    %TODO: SHOW DEFAULT VALUES FOR INPUT PARS
+    %TODO: CHANGE GRAPH LABEL WHEN SWTICH MODE
+    %TODO: CHANGE BUTTON COLOR WHEN USER SELECTS MODE
     mode_op = CheckStructMode(struct_mode_of_operation);
     % mode op determines what type of pop up window 
     if strcmp(mode_op, 'Sub-window-Analysis') == 1
