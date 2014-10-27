@@ -1,6 +1,6 @@
 Cell-Biophysics-Research-at-Oregon-State-University-
 ====================================================
-[![Correlation_GUI_Sample](https://github.com/Cell-Biophysics-Research-at-Oregon-State-University-/Correlation_pic.png)](#features)
+[![Correlation_GUI_Sample](https://github.com/Cell-Biophysics-Research-at-Oregon-State-University-/Correlation_pic.png)
 
 
 My Computational Physics research work for the Cell Biophysics Research Group at Oregon State University 
