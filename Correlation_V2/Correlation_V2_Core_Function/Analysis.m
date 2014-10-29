@@ -21,57 +21,46 @@
 % Final conditions:
 %      Returns a correlation analysis map
 %
-function [corr_res, nematic_graph] = Analysis(mode,theta_range,brange,sigma, ...
+function [corr_res, nematic_graph, absgrid_return] = Analysis(mode,theta_range,brange,sigma, ...
                                               image, pars_mode, handles)
     [image_input, theta_input, b_range_input] = ImageAnaylsisHelper(image, ...
                                                       theta_range, brange);
-    if isempty(pars_mode)
+    if isempty(fieldnames(pars_mode))
         errordlg('Please Set Your Additional Parameters');
         corr_res = '';
         nematic_graph = '';
         return
     end
-    %TODO: HOUGH COLOR SCHEME FOR PLOTTING LINES OF VARIOUS ANGLES
+    %TODO: HOUGH COLOR SCHEME FOR PLOTTING LINES OF VARIOUS ANGLE  
     % default sub-image-size, subject to change
     if strcmp(mode, 'Regular-Corr-Analysis') == 1
+        if (str2num(pars_mode.Threshold) < 0 || str2num(pars_mode.Threshold) > 1)
+            errordlg('Your threshold values must be decimal value between 0 to 1!');
+            corr_res = '';
+            nematic_graph = '';
+            return;
+        end
         h = waitbar(0.1, 'Image loaded, performing correlation and peak finding now');
         corr = correlation_line(image_input, theta_input, b_range_input, sigma); 
         waitbar(0.25,h,'analysis complete, patching up data for display');
-        if isempty(pars_mode.Threshold) == 0
-            % set map value under threshold value to zero
-            % TODO: CHANGE THRESHOLD TO THRESHOLD * MAX(CORR); RELATIVE
-            % THRESHOLD
-             corr(corr < (0.8*str2num(pars_mode.Threshold))) = 0;
-             corr_res = corr;
-             nematic_graph = '';             
+        if isempty(pars_mode.Threshold) == 0           
+            corr(corr < (str2num(pars_mode.Threshold))*max(max(corr))) = 0;
+            corr_res = corr;
+            nematic_graph = '';
+            
         else
             corr_res = corr;
             nematic_graph = '';
         end
     else
-        h = waitbar(0.1, 'Image loaded, performing correlation sub-window analysis');
-        subwdsz = pars_mode.subwdsz;
-        imagesz = size(image_input);
-        end1 = floor(imagesz(1)/subwdsz(1))*subwdsz(1);
-        end2 = floor(imagesz(2)/subwdsz(2))*subwdsz(2);
-        image_input = image_input(1:end1,1:end2);
-        
+        h = waitbar(0.1, 'Image loaded, performing correlation sub-window analysis');        
        [origrid,absgrid, corr,nematicgraph,colsubimgs]= fiberorientation(image_input, ...
                                                             theta_range, ...
                                                             brange,  ...
                                                             sigma, pars_mode);
-        waitbar(0.25,h,'Analysis complete, plotting data');
-        corr_res = zeros(size(absgrid));
-        % TODO: TAKE THIS OUT AND MAKE IT A USER SELECTED OPTION BUTTON
-        for i = 1:length(corr_res(:,1))
-            for j = 1:length(corr_res(1,:))
-                corrsubwd =squeeze(corr(:,:,i,j));
-                temp1 = MaxIntensityFinding(corrsubwd, 3);
-                corr_res(i,j) = sum(temp1(:));  
-            end
-            waitbar(i/length(corr_res(:,1)), h);
-        end
+        corr_res = corr;
         nematic_graph = nematicgraph;
+        absgrid_return = absgrid;
     end
     waitbar(1,h,'Analysis operation Complete ');
     pause(0.3); % let the user see the analysis complete message

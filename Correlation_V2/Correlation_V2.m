@@ -54,6 +54,7 @@ function Correlation_V2_OpeningFcn(hObject, eventdata, handles, varargin)
     clearvars -global path_storage
     clearvars -global struct_mode_of_operation
     clearvars -global pars_structure
+    clearvars -global absgrid
     % set slider values
     slider_min = 2;
     slider_max = 10; % place holder slider value    
@@ -69,8 +70,10 @@ function Correlation_V2_OpeningFcn(hObject, eventdata, handles, varargin)
     struct_mode_name_sub = 'Sub_window_Analysis';
     mode_op_corr_analysis = 0;
     mode_op_sub_window = 0;  
-    struct_mode_of_operation = struct(struct_mode_name_corr, mode_op_corr_analysis, ...
-                                      struct_mode_name_sub, mode_op_sub_window);    
+    struct_mode_of_operation = struct(struct_mode_name_corr, ...
+                                      mode_op_corr_analysis, ...
+                                      struct_mode_name_sub, ...
+                                      mode_op_sub_window);    
 % Choose default command line output for Correlation_V2
 handles.output = hObject;
 % Update handles structure
@@ -197,7 +200,8 @@ function listbox1_Callback(hObject, eventdata, handles)
         axes(handles.axes10);
         image_to_display_handle = imagesc(image_read);       
         % display crop image dialogue if user click on image
-        set(image_to_display_handle, 'ButtonDownFcn',{@CropImage,image_read,handles});        
+        set(image_to_display_handle, 'ButtonDownFcn',{@CropImage, ...
+                                                      image_read,handles});        
     else        
         return
     end
@@ -222,6 +226,8 @@ function pushbutton5_Callback(hObject, eventdata, handles)
     global path_storage 
     global struct_mode_of_operation;
     global pars_structure;
+    global absgrid;
+    
     [ theta, brange, sigma ] = UserVariableInputSanitization(handles);
     [ sanitized_image_name, sanitized_image_pos ] = CheckFileName(handles);
     % boolean to check user input
@@ -230,9 +236,11 @@ function pushbutton5_Callback(hObject, eventdata, handles)
     if check_input == 1
         mode_op = CheckStructMode(struct_mode_of_operation);
         image_to_be_analyzed = imread(path_storage{sanitized_image_pos});         
-        [corr_map_analyzed, nematic_graph] = Analysis(mode_op, theta, brange, sigma, ...
-                                             image_to_be_analyzed, pars_structure, ...
-                                             handles);
+        [corr_map_analyzed, nematic_graph, absgrid] = Analysis(mode_op, theta, ...
+                                                      brange, sigma, ...
+                                                      image_to_be_analyzed, ...
+                                                      pars_structure, ...
+                                                      handles);
         if isempty(corr_map_analyzed) && isempty(nematic_graph)
             return;
         end 
@@ -251,20 +259,14 @@ function pushbutton5_Callback(hObject, eventdata, handles)
             % peak map size
             set(handles.slider1, 'Value',2);
             set(handles.edit7, 'String',2);  
-
         end
-        
-        if strcmp(mode_op, 'Sub-window-Analysis') == 1
-            % display only nematic graph 
-            axes(handles.axes6);
-            imagesc(nematic_graph);
-            set(handles.slider1, 'Value',2);
-            set(handles.edit7, 'String',2); 
-        
-        end
+        axes(handles.axes6);
+        imagesc(nematic_graph);
+       
     else        
         return        
     end   
+    
 % --- Executes on button press in pushbutton6.
 function pushbutton6_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton6 (see GCBO)
@@ -283,14 +285,15 @@ function pushbutton7_Callback(hObject, eventdata, handles)
     global path_storage    
     global pars_structure;
     global struct_mode_of_operation;
-    [ theta, brange, sigma ] = UserVariableInputSanitization(handles);    
-    % File name can be anything, but format must be jpg, tif, tiff, or png 
-    valid_image_extensions = {'.jpg', '.png', '.tif', '.tiff'};    
+    set(handles.pushbutton7,'string','running','enable','off');
+    [ theta, brange, sigma ] = UserVariableInputSanitization(handles);
+    % File name can be anything, but format must be jpg, tif, tiff, or png
+    valid_image_extensions = {'.jpg', '.png', '.tif', '.tiff'};
     mode_op = CheckStructMode(struct_mode_of_operation);
-    for idx = 1:numel(path_storage)            
-        [pathstr, file, ext] = fileparts(path_storage{idx});       
+    for idx = 1:numel(path_storage)
+        [pathstr, file, ext] = fileparts(path_storage{idx});
         if ismember(ext,valid_image_extensions) && (~isempty(theta) ...
-                    && ~isempty(brange) && ~isempty(sigma))   
+                && ~isempty(brange) && ~isempty(sigma))
             image_to_be_analyzed = imread(path_storage{idx});
             corr_map = Analysis(mode_op, theta, brange, sigma, ...
                                 image_to_be_analyzed, pars_structure, ...
@@ -299,18 +302,20 @@ function pushbutton7_Callback(hObject, eventdata, handles)
             % display image, corr_map, and peak_map on graph
             exp_image = imread(path_storage{idx});
             axes(handles.axes10);
-            imagesc(exp_image);          
-            axes(handles.axes6);           
-            imagesc(corr_map);            
+            imagesc(exp_image);
+            axes(handles.axes6);
+            imagesc(corr_map);
             axes(handles.axes11);
             imagesc(peak_map);
-			CountMax(handles, peak_map);
-			PlotPeakOnImage(handles);	
-            % save data 
+            CountMax(handles, peak_map);
+            PlotPeakOnImage(handles);
+            % save data
             experiment_name = sprintf('experiment_number_%d',idx);
-            SaveData(experiment_name);               
-        end   
+            SaveData(experiment_name);
+        end
     end
+    set(handles.pushbutton7,'string','Process All','enable','on');
+   
 
 % --- Executes on button press in pushbutton8.
 function pushbutton8_Callback(hObject, eventdata, handles)
@@ -448,18 +453,39 @@ function pushbutton12_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton12 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)   
-    corr_image = getimage(handles.axes6);
-    dist_threshold_user_input = str2num(get(handles.edit7, 'String')); 
-    new_peak_map = MaxIntensityFinding(corr_image, dist_threshold_user_input); 
-    CountMax(handles,new_peak_map);
-    axes(handles.axes11);
-    imagesc(new_peak_map);
-    PlotPeakOnImage(handles);     
+    global struct_mode_of_operation;
+    global absgrid;
+    mode_op = CheckStructMode(struct_mode_of_operation);
+    result_graph = getimage(handles.axes6);
+    if strcmp(mode_op, 'Regular-Corr-Analysis') == 1
+        dist_threshold_user_input = str2num(get(handles.edit7, 'String'));
+        new_peak_map = MaxIntensityFinding(result_graph, dist_threshold_user_input);
+        CountMax(handles,new_peak_map);
+        axes(handles.axes11);
+        imagesc(new_peak_map);
+        PlotPeakOnImage(handles);
+    else
+        h = waitbar(0.1, 'Performing Peak Finding For Nematic Graph');
+        corr_res = zeros(size(absgrid));
+        for i = 1:length(corr_res(:,1))
+            for j = 1:length(corr_res(1,:))
+                corrsubwd =squeeze(result_graph(i,j));
+                temp1 = MaxIntensityFinding(corrsubwd, 3);
+                corr_res(i,j) = sum(temp1(:));
+            end
+            waitbar(i/length(corr_res(:,1)), h);
+        end
+        waitbar(1,h,'Analysis Complete');
+        close(h);
+        axes(handles.axes11);
+        imagesc(corr_res);
+        
+    end
     
  function StructModeSetting(mode_cmd)      
     global struct_mode_of_operation;
     % compare modes 
-    if strcmp(mode_cmd, 'Correlation_Analysis') == 0       
+    if strcmp(mode_cmd, 'Correlation_Analysis') == 0     
         struct_mode_of_operation.Correlation_Analysis = 1;
         struct_mode_of_operation.Sub_window_Analysis = 0;
     else 
@@ -472,14 +498,24 @@ function pushbutton14_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton14 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+    % change mode and set GUI graphs labels to reflect mode result
     StructModeSetting('Sub_window_Analysis');
+    set(handles.pushbutton14,'ForegroundColor','blue');
+    set(handles.pushbutton15,'ForegroundColor','black');
+    set(handles.uipanel7, 'Title', 'Correlation Result');
+    set(handles.uipanel8, 'Title', 'Correlation Peak Finding');  
 
 % --- Executes on button press in pushbutton15.
 function pushbutton15_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton15 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+    % change mode and set GUI graphs labels to reflect mode result
     StructModeSetting('Correlation_Analysis');
+    set(handles.pushbutton15,'ForegroundColor','blue');
+    set(handles.pushbutton14,'ForegroundColor','black');
+    set(handles.uipanel7, 'Title', 'Sub-window Nematic Graph Result');
+    set(handles.uipanel8, 'Title', 'Nematic Graph Peak Finding');
 
 % --- Executes on button press in pushbutton16.
 function pushbutton16_Callback(hObject, eventdata, handles)
@@ -489,14 +525,12 @@ function pushbutton16_Callback(hObject, eventdata, handles)
     global struct_mode_of_operation;
     global pars_structure;
     %TODO: SHOW DEFAULT VALUES FOR INPUT PARS
-    %TODO: CHANGE GRAPH LABEL WHEN SWTICH MODE
-    %TODO: CHANGE BUTTON COLOR WHEN USER SELECTS MODE
     mode_op = CheckStructMode(struct_mode_of_operation);
     % mode op determines what type of pop up window 
     if strcmp(mode_op, 'Sub-window-Analysis') == 1
-        prompt ={'Subwindow Size:', 'Local Cutoff Point:', ...
-                 'Global Cutoff', 'Normalize'};
-        name = 'Additional Parameters For Sub-window Analysis';
+        prompt = {'Subwindow Size:', 'Local Cutoff Point:', ...
+                  'Global Cutoff', 'Normalize'};
+        name   = 'Additional Parameters For Sub-window Analysis';
         numlines = 1;
         response_pars = inputdlg(prompt,name,numlines);
         if isempty(response_pars) == 1

@@ -1,45 +1,53 @@
-function [origrid,absgrid,corr,nematicgraph,colsubimgs]=fiberorientation(imagenow,pars)
+function [origrid,absgrid,corr,nematicgraph,colsubimgs]=fiberorientation(imagenow,anglerange_input, transrange_input, sigma_input, pars)
 %% outputs
 % origrid, complex nematic order
 % absgrid, absolute value of origrid
-% corr, correlation map from line detection
+% corr, correlation map from line detection, imagesc this
 % nematicgraph, a graphic representation of the nematic map,same size as
-% origrid and absgrid
+% origrid and absgrid imagesc this..... more intense the line, more intense
+% value of color hsv map. Color of huespace determines what angle
 % colsubimgs, the subimages used by line detection in each subwindow
 
 %% Set the parameters
 % ---------------------------------------------------------
 %these parameters for line detection
-if(isfield(pars,'sigma')) %line width
-    sigma = pars.sigma;
+if(isempty(sigma_input) == 0) %line width
+    sigma = sigma_input;
 else
     sigma = 1;
 end
 
-if(isfield(pars,'anglerange')) %line orientation
-    anglerange = pars.anglerange;
+if(isempty(anglerange_input) == 0) %line orientation
+    anglerange = anglerange_input;
 else
     anglerange = [0,1,179];
 end
 
-if(isfield(pars,'transrange')) %line translation
-    transrange = pars.transrange;
+if(isempty(transrange_input) == 0) %line translation
+    transrange = transrange_input;
 else
     transrange = [-2,1,2];
 end
 
-if(isfield(pars,'subwdsz')) %subwindow size
+if(isempty(pars.subwdsz) == 0) %subwindow size
     subwdsz = pars.subwdsz;
+    imagesz = size(imagenow);
+    end1 = floor(imagesz(1)/subwdsz(1))*subwdsz(1);
+    end2 = floor(imagesz(2)/subwdsz(2))*subwdsz(2);
+    imagenow = imagenow(1:end1,1:end2);
 else
     subwdsz = [8,8];
+    imagesz = size(imagenow);
+    end1 = floor(imagesz(1)/subwdsz(1))*subwdsz(1);
+    end2 = floor(imagesz(2)/subwdsz(2))*subwdsz(2);
+    imagenow = imagenow(1:end1,1:end2);
 end
-
 
 %these parameters for removing noise from correlation maps resulted from
 %line detection
 
 %if>1, this is the relative threshold in the correlation map
-if(isfield(pars,'iflocalcutoff')) %subwindow size
+if(~isempty(pars.iflocalcutoff)) %subwindow size
     iflocalcutoff  = pars.iflocalcutoff;
 else
    iflocalcutoff   = 1.1;
@@ -47,18 +55,20 @@ end
 
 
 %if>1, this is the relative threshold in the nematic map
-if(isfield(pars,'ifglobalcutoff')) %subwindow size
+if(~isempty(pars.ifglobalcutoff)) %subwindow size
     ifglobalcutoff  = pars.ifglobalcutoff;
 else
     ifglobalcutoff  = 5;
 end
 
 % if set to be one, the nematic map will be normalized to magnitude of 1
-if(isfield(pars,'ifnormalize ')) %subwindow size
+if(isempty(pars.ifnormalize)) %subwindow size
    ifnormalize   = pars.ifnormalize;
 else
    ifnormalize   = 0;
 end
+
+h = waitbar(0.25, 'Variable initialized');
 %% correlation based line detection
 % ------------------------------------------------
 imgnow = double(imagenow);
@@ -78,10 +88,10 @@ absgrid = zeros(szcorr(3),szcorr(4));
     anglerange(1):anglerange(2):anglerange(3));
 nemafac = exp((2*sqrt(-1)*pi/180.0)*agrid);
 
+waitbar(0.45, h, 'Please wait');
 for xind = 1:szcorr(3)
     for yind = 1:szcorr(4)
         temp1 = squeeze(corr(:,:,xind,yind));
-        %temp1 = temp1/median(temp1(:));
         
        if(iflocalcutoff>1)
            %this is a bit arbitrary and needs test case by case
@@ -91,10 +101,9 @@ for xind = 1:szcorr(3)
                
         origrid(xind,yind) = mean2(nemafac.*temp1);
         absgrid(xind,yind) = abs(origrid(xind,yind));
-               
+        waitbar(1/(szcorr(3)), h);       
     end
 end
-
 
 if(ifglobalcutoff>1)    
    cutoffmagni = max(absgrid(:))/ifglobalcutoff;
@@ -123,6 +132,7 @@ nematicgraph(:,:,1) = huechannel;
 nematicgraph(:,:,2) = 0.8;
 nematicgraph(:,:,3) = valuechannel;
 nematicgraph = hsv2rgb(nematicgraph);
+close(h);
 
 end
 
