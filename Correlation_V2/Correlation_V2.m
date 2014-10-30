@@ -94,7 +94,6 @@ function edit1_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to edit1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
-
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
@@ -226,8 +225,7 @@ function pushbutton5_Callback(hObject, eventdata, handles)
     global path_storage 
     global struct_mode_of_operation;
     global pars_structure;
-    global absgrid;
-    
+    global absgrid;  
     [ theta, brange, sigma ] = UserVariableInputSanitization(handles);
     [ sanitized_image_name, sanitized_image_pos ] = CheckFileName(handles);
     % boolean to check user input
@@ -245,7 +243,7 @@ function pushbutton5_Callback(hObject, eventdata, handles)
             return;
         end 
         %TODO: EXAMINE WHY JELLY FISH FOR 0 1 179 DISPLAY GREEN
-        %TODO: THRESHOLD USER INPUT MUST BE CHECKED
+        
         if strcmp(mode_op, 'Regular-Corr-Analysis') == 1
             % display correlation map and do peak finding 
             axes(handles.axes6);           
@@ -259,9 +257,10 @@ function pushbutton5_Callback(hObject, eventdata, handles)
             % peak map size
             set(handles.slider1, 'Value',2);
             set(handles.edit7, 'String',2);  
+        else       
+            axes(handles.axes6);
+            imagesc(nematic_graph);
         end
-        axes(handles.axes6);
-        imagesc(nematic_graph);
        
     else        
         return        
@@ -295,9 +294,10 @@ function pushbutton7_Callback(hObject, eventdata, handles)
         if ismember(ext,valid_image_extensions) && (~isempty(theta) ...
                 && ~isempty(brange) && ~isempty(sigma))
             image_to_be_analyzed = imread(path_storage{idx});
-            corr_map = Analysis(mode_op, theta, brange, sigma, ...
-                                image_to_be_analyzed, pars_structure, ...
-                                handles);
+            [corr_map_analyzed, nematic_graph, absgrid] = Analysis(mode_op, theta, brange, sigma, ...
+                                                                   image_to_be_analyzed, pars_structure, ...
+                                                                   handles);
+            
             peak_map = MaxIntensityFinding(corr_map);
             % display image, corr_map, and peak_map on graph
             exp_image = imread(path_storage{idx});
@@ -475,6 +475,7 @@ function pushbutton12_Callback(hObject, eventdata, handles)
             end
             waitbar(i/length(corr_res(:,1)), h);
         end
+        CountMax(handles, corr_res);
         waitbar(1,h,'Analysis Complete');
         close(h);
         axes(handles.axes11);
@@ -545,5 +546,8 @@ function pushbutton16_Callback(hObject, eventdata, handles)
         name = 'Additional Parameters For Regular Correlation Analysis';
         numlines = 1;
         response_pars = inputdlg(prompt, name, numlines);
+        if isempty(response_pars) == 1
+            return
+        end
         pars_structure = struct('Threshold', response_pars{1});
     end
