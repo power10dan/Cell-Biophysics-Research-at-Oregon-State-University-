@@ -22,7 +22,7 @@
 %      Returns a correlation analysis map
 %
 function [corr_res, nematic_graph, absgrid_return] = Analysis(mode,theta_range,brange,sigma, ...
-                                              image, pars_mode, handles)
+                                                 image, pars_mode, handles)
     [image_input, theta_input, b_range_input] = ImageAnaylsisHelper(image, ...
                                                       theta_range, brange);
     if isempty(fieldnames(pars_mode))
@@ -32,25 +32,28 @@ function [corr_res, nematic_graph, absgrid_return] = Analysis(mode,theta_range,b
         return
     end
     %TODO: HOUGH COLOR SCHEME FOR PLOTTING LINES OF VARIOUS ANGLE  
-    % default sub-image-size, subject to change
+    % default sub-image-size, subject to change   
     if strcmp(mode, 'Regular-Corr-Analysis') == 1
-        if (str2num(pars_mode.Threshold) < 0 || str2num(pars_mode.Threshold) > 1)
-            errordlg('Your threshold values must be decimal value between 0 to 1!');
-            corr_res = '';
-            nematic_graph = '';
-            return;
+        if isempty(pars_mode.Threshold) == 0        
+            if (str2num(pars_mode.Threshold) < 0 || str2num(pars_mode.Threshold) > 1)
+                errordlg('Your threshold values must be decimal value between 0 to 1!');
+                corr_res = '';
+                nematic_graph = '';
+                return;
+            end
         end
         h = waitbar(0.1, 'Image loaded, performing correlation and peak finding now');
         corr = correlation_line(image_input, theta_input, b_range_input, sigma); 
         waitbar(0.25,h,'analysis complete, patching up data for display');
-        if isempty(pars_mode.Threshold) == 0           
+        if isempty(pars_mode.Threshold) == 1
+            corr_res = corr;
+            nematic_graph = '';
+            absgrid_return = '';
+        else
             corr(corr < (str2num(pars_mode.Threshold))*max(max(corr))) = 0;
             corr_res = corr;
             nematic_graph = '';
-            
-        else
-            corr_res = corr;
-            nematic_graph = '';
+            absgrid_return = '';
         end
     else
         h = waitbar(0.1, 'Image loaded, performing correlation sub-window analysis');        
