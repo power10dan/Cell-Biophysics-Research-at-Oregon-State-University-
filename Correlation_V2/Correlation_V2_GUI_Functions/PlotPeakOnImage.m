@@ -16,16 +16,22 @@ function PlotPeakOnImage(handles)
     original_image = getimage(handles.axes10);
     sz_original_img = size(original_image);
     % change peak map matrix indices to Cartesian coordinates
-    [trans_range,angle] = ind2sub(size(peak_image), find(peak_image == 1));
+    [angle, trans_range] = ind2sub(size(peak_image), find(peak_image == 1));
     % convert image to grayscale for better visualization of plotted line 
     axes(handles.axes10);
     % use angle and trans_range to generate line and plot on the original
     % image
     alllines = zeros(sz_original_img(1:2));
     for idx = 1:numel(angle) 
+        angle_init = str2num(get(handles.edit11, 'String'));
+        angle_step = str2num(get(handles.edit12, 'String'));
+        trans_init = str2num(get(handles.edit1, 'String'));
+        trans_step = str2num(get(handles.edit9, 'String'));
+        true_angle = angle_init+(angle(idx)*angle_step);
+        true_range = trans_init + (trans_range(idx)*trans_step);
         line_img = fuzzyline_gen(sz_original_img(2), sz_original_img(1),...
-                                 angle(idx), trans_range(idx), ...
-                                 str2num(get(handles.edit2, 'String')));       
+                                 true_angle, true_range, ...
+                                 str2num(get(handles.edit2, 'String')));  
         alllines = alllines+line_img;        
     end
     %convert to gray if original image is RGB

@@ -78,10 +78,10 @@ function Correlation_V2_OpeningFcn(hObject, eventdata, handles, varargin)
     set(handles.pushbutton15,'ForegroundColor','blue');
     set(handles.uipanel7, 'Title', 'Sub-window Nematic Graph Result');
     set(handles.uipanel8, 'Title', 'Nematic Graph Peak Finding');
-    pars_structure = struct('subwdsz', str2num(response_pars{1}), ...
-                            'iflocalcutoff', str2num(response_pars{2}), ...
-                            'ifglobalcutoff', str2num(response_pars{3}), ...
-                            'ifnormalize', str2num(response_pars{4}));
+    %pars_structure = struct('subwdsz', str2num(response_pars{1}), ...
+                           % 'iflocalcutoff', str2num(response_pars{2}), ...
+                            %'ifglobalcutoff', str2num(response_pars{3}), ...
+                            %'ifnormalize', str2num(response_pars{4}));
 % Choose default command line output for Correlation_V2
 handles.output = hObject;
 % Update handles structure
@@ -505,10 +505,28 @@ function pushbutton16_Callback(hObject, eventdata, handles)
     global struct_mode_of_operation;
     global pars_structure;
     mode_op = CheckStructMode(struct_mode_of_operation);
+
     % mode op determines what type of pop up window
     if strcmp(mode_op, 'Sub-window-Analysis') == 1
-        prompt = {'Subwindow Size: (default: [8 8]', 'Local Cutoff Point: (default: 1.1)', ...
-                  'Global Cutoff: (default: 5)', 'Normalize: (default: 0)'};
+        if  isempty(pars_structure) == 0
+            prompt = {'Subwindow Size: (default: [8 8])', 'Local Cutoff Point: (default: 1.1)', ...
+                      'Global Cutoff: (default: 5)', 'Normalize: (default: 0)'};
+        end
+        
+        if isempty(pars_structure) == 1
+            disp('hey')
+            prompt_sub_window = sprintf('Subwindow Size: (Inputted: [%d %d])', ...
+                                         pars_structure.subwdsz(1), pars_structure.subwdsz(2))
+            prompt_local_cutoff = sprintf('Local Cutoff point: (Inputted %f)', ...
+                                           pars_structure.iflocalcutoff)
+            prompt_global_cutoff = sprintf('Global Cutoff: (Inputted %f)', ...
+                                           pars_structure.ifglobalcutoff)
+            prompt_normalize = sprintf('Normalize: (Inputted %f)', ...
+                                           pars_structure.ifnormalize)
+                                       
+            prompt = {prompt_sub_window, prompt_local_cutoff, ...
+                      prompt_global_cutoff, prompt_normalize}
+        end
         name   =  'Additional Parameters For Sub-window Analysis';
         numlines = 1;
         response_pars = inputdlg(prompt,name,numlines);
@@ -516,11 +534,11 @@ function pushbutton16_Callback(hObject, eventdata, handles)
             return
         end
         pars_structure = struct('subwdsz', str2num(response_pars{1}), ...
-                                'iflocalcutoff', str2num(response_pars{2}), ...
-                                'ifglobalcutoff', str2num(response_pars{3}), ...
-                                'ifnormalize', str2num(response_pars{4}));
+            'iflocalcutoff', str2num(response_pars{2}), ...
+            'ifglobalcutoff', str2num(response_pars{3}), ...
+            'ifnormalize', str2num(response_pars{4}));
     else
-        prompt = {'Threshold input for image map'};
+        prompt = {'Relative threshold input for correlation map'};
         name = 'Additional Parameters For Regular Correlation Analysis';
         numlines = 1;
         response_pars = inputdlg(prompt, name, numlines);

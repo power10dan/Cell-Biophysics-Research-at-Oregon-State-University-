@@ -35,8 +35,8 @@ function [corr_res, nematic_graph, absgrid_return] = Analysis(mode,theta_range,b
     % default sub-image-size, subject to change   
     if strcmp(mode, 'Regular-Corr-Analysis') == 1
         if isempty(pars_mode.Threshold) == 0        
-            if (str2num(pars_mode.Threshold) < 0 || str2num(pars_mode.Threshold) > 1)
-                errordlg('Your threshold values must be decimal value between 0 to 1!');
+            if (str2num(pars_mode.Threshold) < 1 )
+                errordlg('Your threshold values must be bigger than 1');
                 corr_res = '';
                 nematic_graph = '';
                 return;
@@ -50,7 +50,7 @@ function [corr_res, nematic_graph, absgrid_return] = Analysis(mode,theta_range,b
             nematic_graph = '';
             absgrid_return = '';
         else
-            corr(corr < (str2num(pars_mode.Threshold))*max(max(corr))) = 0;
+            corr(corr < (max(max(corr)) / str2num(pars_mode.Threshold))) = 0;
             corr_res = corr;
             nematic_graph = '';
             absgrid_return = '';
