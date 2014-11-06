@@ -74,14 +74,26 @@ function Correlation_V2_OpeningFcn(hObject, eventdata, handles, varargin)
     struct_mode_of_operation = struct(struct_mode_name_corr, ...
                                       mode_op_corr_analysis, ...
                                       struct_mode_name_sub, ...
-                                      mode_op_sub_window);  
+                                      mode_op_sub_window); 
+    % set up axes label
+    axes(handles.axes6);
+    ylabel('Theta');
+    xlabel('Translation')
+    axes(handles.axes11);
+    ylabel('Theta');
+    xlabel('Translation');
+    axes(handles.axes10);
+    ylabel('Y-Axis');
+    xlabel('X-Axis');
+    % set default button selected
     set(handles.pushbutton15,'ForegroundColor','blue');
+    % set graph label
     set(handles.uipanel7, 'Title', 'Sub-window Nematic Graph Result');
     set(handles.uipanel8, 'Title', 'Nematic Graph Peak Finding');
-    %pars_structure = struct('subwdsz', str2num(response_pars{1}), ...
-                           % 'iflocalcutoff', str2num(response_pars{2}), ...
-                            %'ifglobalcutoff', str2num(response_pars{3}), ...
-                            %'ifnormalize', str2num(response_pars{4}));
+    pars_structure = struct('subwdsz', [], ...
+                            'iflocalcutoff', [], ...
+                            'ifglobalcutoff', [], ...
+                            'ifnormalize', []);
 % Choose default command line output for Correlation_V2
 handles.output = hObject;
 % Update handles structure
@@ -236,7 +248,7 @@ function pushbutton5_Callback(hObject, eventdata, handles)
     [ sanitized_image_name, sanitized_image_pos ] = CheckFileName(handles);
     % boolean to check user input
     check_input = ~isempty(theta) && ~isempty(brange) && ~isempty(sigma) ...
-        && ~isempty(sanitized_image_pos);
+                  && ~isempty(sanitized_image_pos);
     if check_input == 1
         mode_op = CheckStructMode(struct_mode_of_operation);
         image_to_be_analyzed = imread(path_storage{sanitized_image_pos});
@@ -252,8 +264,6 @@ function pushbutton5_Callback(hObject, eventdata, handles)
             % display correlation map and do peak finding
             axes(handles.axes6);
             imagesc(corr_map_analyzed);
-            PeakFindingWrapper('Regular-Corr-Analysis', corr_map_analyzed, ...
-                handles, absgrid);
             % reset edit box and slider values to readjust to the change in
             % peak map size
             set(handles.slider1, 'Value',2);
@@ -505,38 +515,47 @@ function pushbutton16_Callback(hObject, eventdata, handles)
     global struct_mode_of_operation;
     global pars_structure;
     mode_op = CheckStructMode(struct_mode_of_operation);
-
+    % check for empty cells
+    empty_struct_idx = structfun(@isempty, pars_structure);
+    prompt_text = {'Subwindow Size: (Inputted: [%d %d])', ...
+                   'Local Cutoff point: (Inputted %.2f)',...
+                   'Global Cutoff: (Inputted %.2f)', ...
+                   'Normalize: (Inputted %.2f)'};               
+    prompt_text_empty = {'Subwindow Size: (default: [8 8])', ...
+                         'Local Cutoff Point: (default: 1.1)', ...
+                         'Global Cutoff: (default: 5)', ...
+                         'Normalize: (default: 0)'};
     % mode op determines what type of pop up window
     if strcmp(mode_op, 'Sub-window-Analysis') == 1
-        if  isempty(pars_structure) == 0
-            prompt = {'Subwindow Size: (default: [8 8])', 'Local Cutoff Point: (default: 1.1)', ...
-                      'Global Cutoff: (default: 5)', 'Normalize: (default: 0)'};
-        end
-        
         if isempty(pars_structure) == 1
-            disp('hey')
-            prompt_sub_window = sprintf('Subwindow Size: (Inputted: [%d %d])', ...
-                                         pars_structure.subwdsz(1), pars_structure.subwdsz(2))
-            prompt_local_cutoff = sprintf('Local Cutoff point: (Inputted %f)', ...
-                                           pars_structure.iflocalcutoff)
-            prompt_global_cutoff = sprintf('Global Cutoff: (Inputted %f)', ...
-                                           pars_structure.ifglobalcutoff)
-            prompt_normalize = sprintf('Normalize: (Inputted %f)', ...
-                                           pars_structure.ifnormalize)
-                                       
-            prompt = {prompt_sub_window, prompt_local_cutoff, ...
-                      prompt_global_cutoff, prompt_normalize}
+            prompt = {'Subwindow Size: (default: [8 8])', ...
+                      'Local Cutoff Point: (default: 1.1)', ...
+                      'Global Cutoff: (default: 5)', ...
+                      'Normalize: (default: 0)'};
         end
-        name   =  'Additional Parameters For Sub-window Analysis';
+
+        if isempty(pars_structure) == 0
+            field_name = fieldnames(pars_structure);
+            for idx = 1:numel(empty_struct_idx)
+                if empty_struct_idx(idx) == 1                 
+                    prompt{idx} = prompt_text_empty{idx};
+                else
+                    prompt_input = sprintf(prompt_text{idx}, pars_structure.(field_name{idx}));
+                    prompt{idx} = prompt_input;
+                end
+            end
+        end
+
+        name = 'Additional Parameters For Sub-window Analysis';
         numlines = 1;
         response_pars = inputdlg(prompt,name,numlines);
         if isempty(response_pars) == 1
             return
         end
         pars_structure = struct('subwdsz', str2num(response_pars{1}), ...
-            'iflocalcutoff', str2num(response_pars{2}), ...
-            'ifglobalcutoff', str2num(response_pars{3}), ...
-            'ifnormalize', str2num(response_pars{4}));
+                          'iflocalcutoff', str2num(response_pars{2}), ...
+                          'ifglobalcutoff', str2num(response_pars{3}), ...
+                          'ifnormalize', str2num(response_pars{4}));
     else
         prompt = {'Relative threshold input for correlation map'};
         name = 'Additional Parameters For Regular Correlation Analysis';
