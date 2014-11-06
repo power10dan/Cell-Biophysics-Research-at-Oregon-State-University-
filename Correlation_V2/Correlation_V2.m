@@ -261,9 +261,20 @@ function pushbutton5_Callback(hObject, eventdata, handles)
         end
         %TODO: EXAMINE WHY JELLY FISH FOR 0 1 179 DISPLAY GREEN
         if strcmp(mode_op, 'Regular-Corr-Analysis') == 1
-            % display correlation map and do peak finding
-            axes(handles.axes6);
-            imagesc(corr_map_analyzed);
+            % display correlation map and do peak finding              
+            sz_org_img = size(image_to_be_analyzed);
+            axes(handles.axes6);   
+            imagesc(corr_map_analyzed);  
+            % label axes
+            ylabel('Theta');
+            xlabel('Translation');       
+            set(gca, 'XTick',[1:10:200])
+            axes(handles.axes11);
+            ylabel('Theta');
+            xlabel('Translation');
+            axes(handles.axes10);
+            ylabel('Y-Axis');
+            xlabel('X-Axis');
             % reset edit box and slider values to readjust to the change in
             % peak map size
             set(handles.slider1, 'Value',2);
@@ -553,9 +564,9 @@ function pushbutton16_Callback(hObject, eventdata, handles)
             return
         end
         pars_structure = struct('subwdsz', str2num(response_pars{1}), ...
-                          'iflocalcutoff', str2num(response_pars{2}), ...
-                          'ifglobalcutoff', str2num(response_pars{3}), ...
-                          'ifnormalize', str2num(response_pars{4}));
+                                'iflocalcutoff', str2num(response_pars{2}), ...
+                                'ifglobalcutoff', str2num(response_pars{3}), ...
+                                'ifnormalize', str2num(response_pars{4}));
     else
         prompt = {'Relative threshold input for correlation map'};
         name = 'Additional Parameters For Regular Correlation Analysis';
