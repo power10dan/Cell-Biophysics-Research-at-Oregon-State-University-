@@ -24,12 +24,20 @@ function SaveData (experiment_name, handles)
     name_corr = sprintf('%s_corr_map.png', experiment_name);
     name_peak = sprintf('%s_peak_map.png', experiment_name);
     % get expeirmental images and save them in .fig file
-    org_img = getimage(handles.axes10);
-    imwrite(org_img, name_original_image, 'png')
-    corr = getimage(handles.axes6);
-    imwrite(corr, name_corr, 'png');
-    peak_img = getimage(handles.axes11);
-    imwrite(peak_img, name_peak, 'png');
+%     org_img = getimage(handles.axes10);
+    Save_Fig(handles.axes10);
+%     Save_Fig(handles.axes6);
+%     Save_Fig(handles.axes11);
+
     cd ..
     
+end
+
+function Save_Fig(axe)
+    axes(axe);
+    Fig2 = figure;
+    AxesH = axe;
+    copyobj(AxesH, Fig2);
+    var_path = strcat('C:\Users\Sungroup\Documents\MATLAB\Dan\Program_working\Software Package\Correlation_V2\Correlation_V2_Core_Function\Experiment Data\saveddata.tif');
+    export_fig(var_path,'-tif');
 end
