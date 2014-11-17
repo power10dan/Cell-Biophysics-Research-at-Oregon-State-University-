@@ -26,6 +26,7 @@ function SaveData (experiment_name, handles)
     % get expeirmental images and save them in .fig file
 %     org_img = getimage(handles.axes10);
     Save_Fig(handles.axes10);
+
 %     Save_Fig(handles.axes6);
 %     Save_Fig(handles.axes11);
 
@@ -40,4 +41,5 @@ function Save_Fig(axe)
     copyobj(AxesH, Fig2);
     var_path = strcat('C:\Users\Sungroup\Documents\MATLAB\Dan\Program_working\Software Package\Correlation_V2\Correlation_V2_Core_Function\Experiment Data\saveddata.tif');
     export_fig(var_path,'-tif');
+    set(gcf,'color','w');
 end

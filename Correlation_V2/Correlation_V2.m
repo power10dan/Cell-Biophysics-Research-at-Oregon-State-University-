@@ -259,19 +259,26 @@ function pushbutton5_Callback(hObject, eventdata, handles)
         if isempty(corr_map_analyzed) && isempty(nematic_graph)
             return;
         end
+       
         %TODO: EXAMINE WHY JELLY FISH FOR 0 1 179 DISPLAY GREEN
         if strcmp(mode_op, 'Regular-Corr-Analysis') == 1
-            % display correlation map and do peak finding              
-            sz_org_img = size(image_to_be_analyzed);
-            axes(handles.axes6);   
-            imagesc(corr_map_analyzed);  
+            % display correlation map and do peak finding                
+            axes(handles.axes10);
+            % scale axes correctly
+            b_min = str2num(get(handles.edit1, 'String')); 
+            b_max = str2num(get(handles.edit10, 'String')); 
+            b_step = str2num(get(handles.edit9, 'String'));
+            theta_min = str2num(get(handles.edit11, 'String')); 
+            theta_max = str2num(get(handles.edit13, 'String')); 
+            theta_step = str2num(get(handles.edit12, 'String'));
+            axes(handles.axes6);
+            imagesc(b_min:b_step:b_max,theta_min:theta_step:theta_max,corr_map_analyzed);  
             % label axes
-            ylabel('Theta');
-            xlabel('Translation');       
-            set(gca, 'XTick',[1:10:200])
+            xlabel('Translation');   
+            ylabel('Theta');        
             axes(handles.axes11);
-            ylabel('Theta');
             xlabel('Translation');
+            ylabel('Theta');          
             axes(handles.axes10);
             ylabel('Y-Axis');
             xlabel('X-Axis');
@@ -280,8 +287,12 @@ function pushbutton5_Callback(hObject, eventdata, handles)
             set(handles.slider1, 'Value',2);
             set(handles.edit7, 'String',2);
         else
+            axes(handles.axes10);
+            xLimits = get(gca,'XLim');  %# Get the range of the x axis
+            yLimits = get(gca,'YLim');  %# Get the range of the y axis
             axes(handles.axes6);
-            imagesc(nematic_graph);
+            imagesc(xLimits, yLimits,nematic_graph);
+            
         end
     else
         return
@@ -296,7 +307,7 @@ function pushbutton6_Callback(hObject, eventdata, handles)
     saved_file_name = inputdlg(prompt);   
     % saved_file_name is a cell string. saved_file_name{1} turns the cell
     % string into a string
-    SaveData(saved_file_name{1});
+    SaveData(saved_file_name{1}, handles);
 % --- Executes on button press in pushbutton7.
 function pushbutton7_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton7 (see GCBO)
@@ -321,8 +332,11 @@ function pushbutton7_Callback(hObject, eventdata, handles)
             axes(handles.axes10);
             imagesc(exp_image);
             if strcmp(mode_op, 'Regular-Corr-Analysis') == 1
+                axes(handles.axes10);
+                xLimits = get(gca,'XLim'); % Get the range of the x axis
+                yLimits = get(gca,'YLim'); % Get the range of the y axis                
                 axes(handles.axes6);
-                imagesc(corr_map_analyzed);
+                imagesc(xLimits, yLimits, corr_map_analyzed);
                 PeakFindingWrapper('Regular-Corr-Analysis', corr_map_analyzed,...
                     handles, absgrid);
             else
@@ -332,8 +346,8 @@ function pushbutton7_Callback(hObject, eventdata, handles)
                     handles, absgrid);
             end
             % save data
-            experiment_name = sprintf('experiment_number_%d',idx);
-            SaveData(experiment_name);
+            experiment_name = sprintf('%s_experiment_%d',file,idx);
+            SaveData(experiment_name, handles);
         end
     end
 
@@ -477,6 +491,9 @@ function pushbutton12_Callback(hObject, eventdata, handles)
     global absgrid;
     mode_op = CheckStructMode(struct_mode_of_operation);
     result_graph = getimage(handles.axes6);
+    if isempty(result_graph)
+        return;
+    end
     if strcmp(mode_op, 'Regular-Corr-Analysis') == 1
         PeakFindingWrapper('Regular-Corr-Analysis', result_graph,handles, absgrid);
     else
@@ -527,7 +544,6 @@ function pushbutton16_Callback(hObject, eventdata, handles)
     global pars_structure;
     mode_op = CheckStructMode(struct_mode_of_operation);
     % check for empty cells
-    empty_struct_idx = structfun(@isempty, pars_structure);
     prompt_text = {'Subwindow Size: (Inputted: [%d %d])', ...
                    'Local Cutoff point: (Inputted %.2f)',...
                    'Global Cutoff: (Inputted %.2f)', ...
@@ -537,26 +553,35 @@ function pushbutton16_Callback(hObject, eventdata, handles)
                          'Global Cutoff: (default: 5)', ...
                          'Normalize: (default: 0)'};
     % mode op determines what type of pop up window
-    if strcmp(mode_op, 'Sub-window-Analysis') == 1
-        if isempty(pars_structure) == 1
-            prompt = {'Subwindow Size: (default: [8 8])', ...
-                      'Local Cutoff Point: (default: 1.1)', ...
-                      'Global Cutoff: (default: 5)', ...
-                      'Normalize: (default: 0)'};
+    if strcmp(mode_op, 'Sub-window-Analysis') == 1 
+        pars_structure
+        if isfield(pars_structure, 'Threshold') == 1
+            pars_structure = struct('subwdsz', [], ...
+                            'iflocalcutoff', [], ...
+                            'ifglobalcutoff', [], ...
+                            'ifnormalize', []);           
         end
-
+        % if struct is empty
+        if isempty(pars_structure) == 1
+            prompt = promt_text_empty;
+        end
+        
+        empty_struct_idx = structfun(@isempty, pars_structure);
+        % if struct is not empty, then take user input and put them as
+        % the default prompt inside the message line 
         if isempty(pars_structure) == 0
             field_name = fieldnames(pars_structure);
             for idx = 1:numel(empty_struct_idx)
                 if empty_struct_idx(idx) == 1                 
                     prompt{idx} = prompt_text_empty{idx};
                 else
+                    sprintf(prompt_text{idx}, pars_structure.(field_name{idx}));
+                    % combine prompt with field name input by user
                     prompt_input = sprintf(prompt_text{idx}, pars_structure.(field_name{idx}));
                     prompt{idx} = prompt_input;
-                end
+                end              
             end
         end
-
         name = 'Additional Parameters For Sub-window Analysis';
         numlines = 1;
         response_pars = inputdlg(prompt,name,numlines);
@@ -564,10 +589,11 @@ function pushbutton16_Callback(hObject, eventdata, handles)
             return
         end
         pars_structure = struct('subwdsz', str2num(response_pars{1}), ...
-                                'iflocalcutoff', str2num(response_pars{2}), ...
-                                'ifglobalcutoff', str2num(response_pars{3}), ...
-                                'ifnormalize', str2num(response_pars{4}));
+                            'iflocalcutoff', str2num(response_pars{2}), ...
+                            'ifglobalcutoff', str2num(response_pars{3}), ...
+                            'ifnormalize', str2num(response_pars{4}));       
     else
+        pars_structure = struct('Threshold', []);
         prompt = {'Relative threshold input for correlation map'};
         name = 'Additional Parameters For Regular Correlation Analysis';
         numlines = 1;
