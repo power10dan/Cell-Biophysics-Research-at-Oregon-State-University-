@@ -264,6 +264,7 @@ function pushbutton5_Callback(hObject, eventdata, handles)
         if strcmp(mode_op, 'Regular-Corr-Analysis') == 1
             % display correlation map and do peak finding                
             axes(handles.axes10);
+            % scale axes correctly
             b_min = str2num(get(handles.edit1, 'String')); 
             b_max = str2num(get(handles.edit10, 'String')); 
             b_step = str2num(get(handles.edit9, 'String'));
@@ -490,6 +491,9 @@ function pushbutton12_Callback(hObject, eventdata, handles)
     global absgrid;
     mode_op = CheckStructMode(struct_mode_of_operation);
     result_graph = getimage(handles.axes6);
+    if isempty(result_graph)
+        return;
+    end
     if strcmp(mode_op, 'Regular-Corr-Analysis') == 1
         PeakFindingWrapper('Regular-Corr-Analysis', result_graph,handles, absgrid);
     else
@@ -555,18 +559,15 @@ function pushbutton16_Callback(hObject, eventdata, handles)
             pars_structure = struct('subwdsz', [], ...
                             'iflocalcutoff', [], ...
                             'ifglobalcutoff', [], ...
-                            'ifnormalize', []);
-           
+                            'ifnormalize', []);           
         end
-        
+        % if struct is empty
         if isempty(pars_structure) == 1
-            prompt = {'Subwindow Size: (default: [8 8])', ...
-                      'Local Cutoff Point: (default: 1.1)', ...
-                      'Global Cutoff: (default: 5)', ...
-                      'Normalize: (default: 0)'};
-        end
+            prompt = promt_text_empty;
+        end       
         empty_struct_idx = structfun(@isempty, pars_structure);
-            
+        % if struct is not empty, then take user input and put them as
+        % the default prompt inside the message line 
         if isempty(pars_structure) == 0
             field_name = fieldnames(pars_structure);
             for idx = 1:numel(empty_struct_idx)
@@ -574,10 +575,10 @@ function pushbutton16_Callback(hObject, eventdata, handles)
                     prompt{idx} = prompt_text_empty{idx};
                 else
                     sprintf(prompt_text{idx}, pars_structure.(field_name{idx}));
+                    % combine prompt with field name input by user
                     prompt_input = sprintf(prompt_text{idx}, pars_structure.(field_name{idx}));
                     prompt{idx} = prompt_input;
-                end
-                
+                end              
             end
         end
         name = 'Additional Parameters For Sub-window Analysis';
@@ -586,7 +587,6 @@ function pushbutton16_Callback(hObject, eventdata, handles)
         if isempty(response_pars) == 1
             return
         end
-        celldisp(response_pars)
         pars_structure = struct('subwdsz', str2num(response_pars{1}), ...
                             'iflocalcutoff', str2num(response_pars{2}), ...
                             'ifglobalcutoff', str2num(response_pars{3}), ...
@@ -602,3 +602,4 @@ function pushbutton16_Callback(hObject, eventdata, handles)
         end
         pars_structure = struct('Threshold', response_pars{1});
     end
+   

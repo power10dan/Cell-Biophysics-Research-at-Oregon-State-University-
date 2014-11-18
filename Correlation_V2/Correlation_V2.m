@@ -564,8 +564,7 @@ function pushbutton16_Callback(hObject, eventdata, handles)
         % if struct is empty
         if isempty(pars_structure) == 1
             prompt = promt_text_empty;
-        end
-        
+        end       
         empty_struct_idx = structfun(@isempty, pars_structure);
         % if struct is not empty, then take user input and put them as
         % the default prompt inside the message line 
@@ -603,3 +602,4 @@ function pushbutton16_Callback(hObject, eventdata, handles)
         end
         pars_structure = struct('Threshold', response_pars{1});
     end
+   
