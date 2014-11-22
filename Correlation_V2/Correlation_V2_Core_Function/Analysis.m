@@ -23,6 +23,7 @@
 %
 function [corr_res, nematic_graph, absgrid_return] = Analysis(mode,theta_range,brange,sigma, ...
                                                  image, pars_mode, handles)
+    
     [image_input, theta_input, b_range_input] = ImageAnaylsisHelper(image, ...
                                                       theta_range, brange);
     if isempty(fieldnames(pars_mode))
@@ -74,7 +75,10 @@ function [image_output, theta_input, b_range_input] = ImageAnaylsisHelper( ...
                                                       image_to_be_analyzed, ...
                                                       theta, brange)
     image_output = single(image_to_be_analyzed);
+    if(length(size(image_to_be_analyzed))>2)
     image_output = rgb2gray(image_output);
+    end
+    
     theta_input = [theta(1),theta(2),theta(3)];
     b_range_input = [brange(1),brange(2),brange(3)];
 end

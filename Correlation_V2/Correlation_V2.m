@@ -244,6 +244,8 @@ function pushbutton5_Callback(hObject, eventdata, handles)
     global struct_mode_of_operation;
     global pars_structure;
     global absgrid;
+    global corr_map_analyzed;
+    global nematic_graph;
     [ theta, brange, sigma ] = UserVariableInputSanitization(handles);
     [ sanitized_image_name, sanitized_image_pos ] = CheckFileName(handles);
     % boolean to check user input
@@ -489,15 +491,13 @@ function pushbutton12_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)   
     global struct_mode_of_operation;
     global absgrid;
-    mode_op = CheckStructMode(struct_mode_of_operation);
-    result_graph = getimage(handles.axes6);
-    if isempty(result_graph)
-        return;
-    end
+    global corr_map_analyzed
+    global nematic_graph;
+    mode_op = CheckStructMode(struct_mode_of_operation);  
     if strcmp(mode_op, 'Regular-Corr-Analysis') == 1
-        PeakFindingWrapper('Regular-Corr-Analysis', result_graph,handles, absgrid);
+        PeakFindingWrapper('Regular-Corr-Analysis', corr_map_analyzed,handles, absgrid);
     else
-        PeakFindingWrapper('Sub-window-Analysis', result_graph, handles, absgrid);
+        PeakFindingWrapper('Sub-window-Analysis', nematic_graph, handles, absgrid);
     end
 
 function StructModeSetting(mode_cmd)

@@ -16,7 +16,7 @@
 % Post-Condition: an intensity map showing where the maximums are on the
 % correlation map. 
 
-function [label_map] = MaxIntensityFinding (correlation_map,dist_input)   
+function [label_map] = MaxIntensityFinding (correlation_map,dist_input) 
     if(nargin == 2)      
         distance_threshold = dist_input;   
     else    
@@ -32,10 +32,10 @@ function [label_map] = MaxIntensityFinding (correlation_map,dist_input)
             pixuseful = dist < distance_threshold;                
             if (correlation_map(indy,indx) >= max(correlation_map(pixuseful)))
                 label_map(indy,indx) = 1;            
-            end           
-        end
+            end  
+
+        end     
     end  
-    %label_map(correlation_map<0.1*max(correlation_map(:)));
 	%filter out false peaks
     label_map(correlation_map == 0) = 0;
 end
