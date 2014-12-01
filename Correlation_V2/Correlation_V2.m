@@ -160,8 +160,9 @@ function pushbutton2_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton2 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+    %clearvars -global path_storage
     clearvars -global path_storage
-    set(handles.listbox1, 'String', '');     
+    set(handles.listbox1, 'String', '');  
 % --- Executes on button press in pushbutton3.
 function pushbutton3_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton3 (see GCBO)
@@ -189,7 +190,7 @@ function pushbutton3_Callback(hObject, eventdata, handles)
 																	   % and name together      
     end
     path_storage = new_path_list;
-
+   
 % --- Executes on button press in pushbutton4.
 function pushbutton4_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton4 (see GCBO)
@@ -212,15 +213,14 @@ function listbox1_Callback(hObject, eventdata, handles)
     if isempty(get(handles.listbox1,'string')) 
         return;  
     end        
-    [sanitized_image_name, sanitized_image_pos] = CheckFileName(handles);   
+    [sanitized_image_name, sanitized_image_pos] = CheckFileName(handles);  
     if ~isempty(sanitized_image_name)
         % read image and display image on axes1
         image_read = imread(path_storage{sanitized_image_pos});   
         axes(handles.axes10);
         image_to_display_handle = imagesc(image_read);       
         % display crop image dialogue if user click on image
-        set(image_to_display_handle, 'ButtonDownFcn',{@CropImage, ...
-                                                      image_read,handles});        
+        set(image_to_display_handle, 'ButtonDownFcn',{@CropImage, image_read,handles});        
     else        
         return
     end
@@ -293,8 +293,7 @@ function pushbutton5_Callback(hObject, eventdata, handles)
             xLimits = get(gca,'XLim');  %# Get the range of the x axis
             yLimits = get(gca,'YLim');  %# Get the range of the y axis
             axes(handles.axes6);
-            imagesc(xLimits, yLimits,nematic_graph);
-            
+            imagesc(xLimits, yLimits,nematic_graph);           
         end
     else
         return
@@ -340,12 +339,12 @@ function pushbutton7_Callback(hObject, eventdata, handles)
                 axes(handles.axes6);
                 imagesc(xLimits, yLimits, corr_map_analyzed);
                 PeakFindingWrapper('Regular-Corr-Analysis', corr_map_analyzed,...
-                    handles, absgrid);
+                                   handles, absgrid);
             else
                 axes(handles.axes6);
                 imagesc(nematic_graph);
                 PeakFindingWrapper('Sub-window-Analysis', nematic_graph, ...
-                    handles, absgrid);
+                                   handles, absgrid);
             end
             % save data
             experiment_name = sprintf('%s_experiment_%d',file,idx);
