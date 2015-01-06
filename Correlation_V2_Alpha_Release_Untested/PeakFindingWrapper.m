@@ -18,12 +18,17 @@ function PeakFindingWrapper(mode_op, corr_data, handles, absgrid)
         ylabel('Theta');  
         PlotPeakOnImage(handles);
         
-    else
-        
+    else        
         h = waitbar(0.1, 'Performing Peak Finding For Nematic Graph');
+        size(absgrid)
         nematic_graph_peak_map = zeros(size(absgrid));
-        for i = 1:length(nematic_graph_peak_map(1,:))
-            for j = 1:length(nematic_graph_peak_map(:,1))
+      
+        if(length(size(corr_data))>2)
+             corr_data = rgb2gray(corr_data);          
+        end
+        
+        for i =  1:length(nematic_graph_peak_map(:,1))
+            for j = 1:length(nematic_graph_peak_map(1,:))
                 corrsubwd =squeeze(corr_data(i,j));
                 temp1 = MaxIntensityFinding(corrsubwd, dist_threshold_user_input);
                 nematic_graph_peak_map(i,j) = sum(temp1(:));
@@ -34,8 +39,8 @@ function PeakFindingWrapper(mode_op, corr_data, handles, absgrid)
         waitbar(1,h,'Analysis Complete');
         close(h);
         axes(handles.axes10);
-        xLimits = get(gca,'XLim');  %# Get the range of the x axis
-        yLimits = get(gca,'YLim');  %# Get the range of the y axis
+        xLimits = get(gca,'XLim');  % Get the range of the x axis
+        yLimits = get(gca,'YLim');  % Get the range of the y axis
         axes(handles.axes11);
         imagesc(xLimits, yLimits,nematic_graph_peak_map);
     end
