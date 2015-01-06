@@ -77,11 +77,11 @@ function Correlation_V2_OpeningFcn(hObject, eventdata, handles, varargin)
                                       mode_op_sub_window); 
     % set up axes label
     axes(handles.axes6);
-    ylabel('Theta');
-    xlabel('Translation')
+    ylabel('Y-Axis');
+    xlabel('X-Axis')
     axes(handles.axes11);
-    ylabel('Theta');
-    xlabel('Translation');
+    ylabel('Y-Axis');
+    xlabel('X-Axis');
     axes(handles.axes10);
     ylabel('Y-Axis');
     xlabel('X-Axis');
@@ -181,8 +181,7 @@ function pushbutton3_Callback(hObject, eventdata, handles)
     % GetAndSetImageFile returns the full path of the image
     % file with the image's name inside image_file_name variable if uigetfile is invoked. Thus, we
     % only have to add this path to the path_storage variable.     
-    if ~iscell(image_file_path)       
-        image_file_path = {image_file_name};  
+    if ~iscell(image_file_path)         
         new_path_list = horzcat(existing_path_list, image_file_path);        
     else       
         new_path_list = horzcat(existing_path_list, image_file_path);  % file path from uigetdir, 
@@ -247,6 +246,12 @@ function pushbutton5_Callback(hObject, eventdata, handles)
     global corr_map_analyzed;
     global nematic_graph;
     [ theta, brange, sigma ] = UserVariableInputSanitization(handles);
+    theta_range = sprintf('Theta (start, step, end): %d %d %d', ...
+                          theta(1), theta(2), theta(3));
+    b_range = sprintf('b_range (start, step, end): %d %d %d', brange(1), brange(2), brange(3));
+    sigma_value = sprintf('Sigma: %f', sigma);
+    data_array = {theta_range, b_range, sigma_value};   
+    Export_Data(data_array, 'Input Arguments');
     [ sanitized_image_name, sanitized_image_pos ] = CheckFileName(handles);
     % boolean to check user input
     check_input = ~isempty(theta) && ~isempty(brange) && ~isempty(sigma) ...
@@ -256,13 +261,12 @@ function pushbutton5_Callback(hObject, eventdata, handles)
         image_to_be_analyzed = imread(path_storage{sanitized_image_pos});
         % perform analysis
         [corr_map_analyzed, nematic_graph, absgrid] = Analysis(mode_op, theta, ...
-            brange, sigma, image_to_be_analyzed, pars_structure,  handles);
+            brange, sigma, image_to_be_analyzed, pars_structure, handles);
         
         if isempty(corr_map_analyzed) && isempty(nematic_graph)
             return;
         end
-       
-        %TODO: EXAMINE WHY JELLY FISH FOR 0 1 179 DISPLAY GREEN
+        
         if strcmp(mode_op, 'Regular-Corr-Analysis') == 1
             % display correlation map and do peak finding                
             axes(handles.axes10);
@@ -276,8 +280,8 @@ function pushbutton5_Callback(hObject, eventdata, handles)
             axes(handles.axes6);
             imagesc(b_min:b_step:b_max,theta_min:theta_step:theta_max,corr_map_analyzed);  
             % label axes
-            xlabel('Translation');   
-            ylabel('Theta');        
+            xlabel('X-Axis');   
+            ylabel('Y-Axis');        
             axes(handles.axes11);
             xlabel('Translation');
             ylabel('Theta');          
@@ -318,6 +322,10 @@ function pushbutton7_Callback(hObject, eventdata, handles)
     global pars_structure;
     global struct_mode_of_operation;
     [ theta, brange, sigma ] = UserVariableInputSanitization(handles);
+    b_range = sprintf('b_range (start, step, end): %d %d %d', brange(1), brange(2), brange(3));
+    sigma_value = sprintf('Sigma: %f', sigma);
+    data_array = {theta_range, b_range, sigma_value}; 
+    Export_Data(data_array, 'Input Arguments');
     % File name can be anything, but format must be jpg, tif, tiff, or png
     valid_image_extensions = {'.jpg', '.png', '.tif', '.tiff'};
     mode_op = CheckStructMode(struct_mode_of_operation);
@@ -484,6 +492,7 @@ function edit2_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 % --- Executes on button press in pushbutton12
+
 function pushbutton12_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton12 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -494,7 +503,7 @@ function pushbutton12_Callback(hObject, eventdata, handles)
     global nematic_graph;
     mode_op = CheckStructMode(struct_mode_of_operation);  
     if strcmp(mode_op, 'Regular-Corr-Analysis') == 1
-        PeakFindingWrapper('Regular-Corr-Analysis', corr_map_analyzed,handles, absgrid);
+        PeakFindingWrapper('Regular-Corr-Analysis', corr_map_analyzed, handles, absgrid);
     else
         PeakFindingWrapper('Sub-window-Analysis', nematic_graph, handles, absgrid);
     end
@@ -553,7 +562,6 @@ function pushbutton16_Callback(hObject, eventdata, handles)
                          'Normalize: (default: 0)'};
     % mode op determines what type of pop up window
     if strcmp(mode_op, 'Sub-window-Analysis') == 1 
-        pars_structure
         if isfield(pars_structure, 'Threshold') == 1
             pars_structure = struct('subwdsz', [], ...
                             'iflocalcutoff', [], ...
@@ -582,14 +590,18 @@ function pushbutton16_Callback(hObject, eventdata, handles)
         end
         name = 'Additional Parameters For Sub-window Analysis';
         numlines = 1;
+        
         response_pars = inputdlg(prompt,name,numlines);
+
         if isempty(response_pars) == 1
             return
         end
         pars_structure = struct('subwdsz', str2num(response_pars{1}), ...
                             'iflocalcutoff', str2num(response_pars{2}), ...
                             'ifglobalcutoff', str2num(response_pars{3}), ...
-                            'ifnormalize', str2num(response_pars{4}));       
+                            'ifnormalize', str2num(response_pars{4})); 
+                        
+        Export_Data(pars_structure, 'Additional Parameters, sub window');
     else
         pars_structure = struct('Threshold', []);
         prompt = {'Relative threshold input for correlation map'};
@@ -597,8 +609,10 @@ function pushbutton16_Callback(hObject, eventdata, handles)
         numlines = 1;
         response_pars = inputdlg(prompt, name, numlines);
         if isempty(response_pars) == 1
+            Export_Data(pars_structure, 'Additional Parameters, regular correlation');
             return
         end
         pars_structure = struct('Threshold', response_pars{1});
+        Export_Data(pars_structure, 'Additional Parameters, regular correlation');
     end
    
