@@ -26,15 +26,18 @@ function [corr_res, nematic_graph, absgrid_return] = Analysis(mode,theta_range,b
     
     [image_input, theta_input, b_range_input] = ImageAnaylsisHelper(image, ...
                                                       theta_range, brange);
+                                   
+pars_mode
     if isempty(fieldnames(pars_mode))
         errordlg('Please Set Your Additional Parameters');
         corr_res = '';
         nematic_graph = '';
+        absgrid_return = '';
         return
     end
-    %TODO: HOUGH COLOR SCHEME FOR PLOTTING LINES OF VARIOUS ANGLE  
     % default sub-image-size, subject to change   
     if strcmp(mode, 'Regular-Corr-Analysis') == 1
+        isfield(pars_mode, 'Threshold')
         if isempty(pars_mode.Threshold) == 0        
             if str2num(pars_mode.Threshold) < 1 
                 errordlg('Your threshold values must be bigger than 1');
@@ -51,7 +54,7 @@ function [corr_res, nematic_graph, absgrid_return] = Analysis(mode,theta_range,b
             nematic_graph = '';
             absgrid_return = '';
         else
-            corr(corr < (max(max(corr)) / str2num(pars_mode.Threshold))) = 0;
+            corr(corr < (max(corr(:)) / str2num(pars_mode.Threshold))) = 0;
             corr_res = corr;
             nematic_graph = '';
             absgrid_return = '';
@@ -76,7 +79,7 @@ function [image_output, theta_input, b_range_input] = ImageAnaylsisHelper( ...
                                                       theta, brange)
     image_output = single(image_to_be_analyzed);
     if(length(size(image_to_be_analyzed))>2)
-    image_output = rgb2gray(image_output);
+        image_output = rgb2gray(image_output);
     end
     
     theta_input = [theta(1),theta(2),theta(3)];

@@ -239,24 +239,23 @@ function pushbutton5_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton5 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    global path_storage
+    global path_storage;
     global struct_mode_of_operation;
     global pars_structure;
     global absgrid;
     global corr_map_analyzed;
     global nematic_graph;
     [ theta, brange, sigma ] = UserVariableInputSanitization(handles);
-    theta_range = sprintf('Theta (start, step, end): %d %d %d', ...
-                          theta(1), theta(2), theta(3));
-    b_range = sprintf('b_range (start, step, end): %d %d %d', brange(1), brange(2), brange(3));
-    sigma_value = sprintf('Sigma: %f', sigma);
-    data_array = {theta_range, b_range, sigma_value};   
-    Export_Data(data_array, 'Input Arguments');
     [ sanitized_image_name, sanitized_image_pos ] = CheckFileName(handles);
     % boolean to check user input
     check_input = ~isempty(theta) && ~isempty(brange) && ~isempty(sigma) ...
                   && ~isempty(sanitized_image_pos);
     if check_input == 1
+        theta_range = sprintf('Theta (start, step, end): %d %d %d', ...
+                          theta(1), theta(2), theta(3));
+        b_range = sprintf('b_range (start, step, end): %d %d %d', brange(1), brange(2), brange(3));
+        sigma_value = sprintf('Sigma: %f', sigma);
+        data_array = {theta_range, b_range, sigma_value};   
         mode_op = CheckStructMode(struct_mode_of_operation);
         image_to_be_analyzed = imread(path_storage{sanitized_image_pos});
         % perform analysis
@@ -266,6 +265,8 @@ function pushbutton5_Callback(hObject, eventdata, handles)
         if isempty(corr_map_analyzed) && isempty(nematic_graph)
             return;
         end
+        
+        Export_Data(data_array, 'Input Arguments', mode_op);
         
         if strcmp(mode_op, 'Regular-Corr-Analysis') == 1
             % display correlation map and do peak finding                
@@ -310,6 +311,10 @@ function pushbutton6_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
     prompt = ' What would you like to save your file as? ';
     saved_file_name = inputdlg(prompt);   
+    if isempty(saved_file_name) || strcmp(saved_file_name, '') == 1
+        errordlg('You did not input a file name, please try again');
+        return
+    end
     % saved_file_name is a cell string. saved_file_name{1} turns the cell
     % string into a string
     SaveData(saved_file_name{1}, handles);
@@ -322,10 +327,6 @@ function pushbutton7_Callback(hObject, eventdata, handles)
     global pars_structure;
     global struct_mode_of_operation;
     [ theta, brange, sigma ] = UserVariableInputSanitization(handles);
-    b_range = sprintf('b_range (start, step, end): %d %d %d', brange(1), brange(2), brange(3));
-    sigma_value = sprintf('Sigma: %f', sigma);
-    data_array = {theta_range, b_range, sigma_value}; 
-    Export_Data(data_array, 'Input Arguments');
     % File name can be anything, but format must be jpg, tif, tiff, or png
     valid_image_extensions = {'.jpg', '.png', '.tif', '.tiff'};
     mode_op = CheckStructMode(struct_mode_of_operation);
@@ -333,6 +334,7 @@ function pushbutton7_Callback(hObject, eventdata, handles)
         [pathstr, file, ext] = fileparts(path_storage{idx});
         if ismember(ext,valid_image_extensions) && (~isempty(theta) ...
                 && ~isempty(brange) && ~isempty(sigma))
+
             image_to_be_analyzed = imread(path_storage{idx});
             [corr_map_analyzed, nematic_graph, absgrid] = Analysis(mode_op, theta, brange, sigma, ...
                 image_to_be_analyzed, pars_structure, handles);
@@ -340,6 +342,7 @@ function pushbutton7_Callback(hObject, eventdata, handles)
             exp_image = imread(path_storage{idx});
             axes(handles.axes10);
             imagesc(exp_image);
+
             if strcmp(mode_op, 'Regular-Corr-Analysis') == 1
                 axes(handles.axes10);
                 xLimits = get(gca,'XLim'); % Get the range of the x axis
@@ -354,11 +357,19 @@ function pushbutton7_Callback(hObject, eventdata, handles)
                 PeakFindingWrapper('Sub-window-Analysis', nematic_graph, ...
                                    handles, absgrid);
             end
+            
             % save data
             experiment_name = sprintf('%s_experiment_%d',file,idx);
             SaveData(experiment_name, handles);
         end
     end
+    theta_range = sprintf('Theta (start, step, end): %d %d %d', ...
+                          theta(1), theta(2), theta(3));
+    b_range = sprintf('b_range (start, step, end): %d %d %d', brange(1), brange(2), brange(3));
+    sigma_value = sprintf('Sigma: %f', sigma);
+    data_array = {theta_range, b_range, sigma_value}; 
+    Export_Data(data_array, 'Input Arguments', mode_op);
+
 
 % --- Executes on button press in pushbutton8.
 function pushbutton8_Callback(hObject, eventdata, handles)
@@ -499,9 +510,16 @@ function pushbutton12_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)   
     global struct_mode_of_operation;
     global absgrid;
-    global corr_map_analyzed
+    global corr_map_analyzed;
     global nematic_graph;
-    mode_op = CheckStructMode(struct_mode_of_operation);  
+
+    mode_op = CheckStructMode(struct_mode_of_operation); 
+    
+    if isempty(getimage(handles.axes6)) ==1
+        errordlg('You did not produce a peak map with your image');
+        return;
+    end
+    
     if strcmp(mode_op, 'Regular-Corr-Analysis') == 1
         PeakFindingWrapper('Regular-Corr-Analysis', corr_map_analyzed, handles, absgrid);
     else
@@ -560,7 +578,9 @@ function pushbutton16_Callback(hObject, eventdata, handles)
                          'Local Cutoff Point: (default: 1.1)', ...
                          'Global Cutoff: (default: 5)', ...
                          'Normalize: (default: 0)'};
-    % mode op determines what type of pop up window
+
+    % mode op determines what type of pop up window for additional
+    % parameters
     if strcmp(mode_op, 'Sub-window-Analysis') == 1 
         if isfield(pars_structure, 'Threshold') == 1
             pars_structure = struct('subwdsz', [], ...
@@ -601,8 +621,11 @@ function pushbutton16_Callback(hObject, eventdata, handles)
                             'ifglobalcutoff', str2num(response_pars{3}), ...
                             'ifnormalize', str2num(response_pars{4})); 
                         
-        Export_Data(pars_structure, 'Additional Parameters, sub window');
+        Export_Data(pars_structure, 'Add_params, sub window', mode_op);
     else
+        if isfield(pars_structure, 'subwdsz') == 1
+            pars_structure = struct('Threshold', []);
+        end
         pars_structure = struct('Threshold', []);
         prompt = {'Relative threshold input for correlation map'};
         name = 'Additional Parameters For Regular Correlation Analysis';
@@ -613,6 +636,6 @@ function pushbutton16_Callback(hObject, eventdata, handles)
             return
         end
         pars_structure = struct('Threshold', response_pars{1});
-        Export_Data(pars_structure, 'Additional Parameters, regular correlation');
+        Export_Data(pars_structure, 'Add Params, regular correlation', mode_op);
     end
    

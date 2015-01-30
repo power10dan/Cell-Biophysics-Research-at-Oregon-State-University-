@@ -23,7 +23,7 @@ function [image_file_name, image_file_path] = GetAndSetImageFile(handles)
     curr_listbox_files = get(handles.listbox1,'String');       
     switch choice       
         case 'Directory'
-            directory_path = uigetdir;           
+            directory_path = uigetdir;          
             if directory_path == 0
                 image_file_name = '';
                 image_file_path = '';
@@ -34,6 +34,7 @@ function [image_file_name, image_file_path] = GetAndSetImageFile(handles)
             ind = [files_and_folders_in_directory(:).isdir];
             nodir = find(~ind);
             file_names = files_and_folders_in_directory(nodir);
+            file_names.name;
             path_array = cell(1,numel(file_names));
            
             for idx = 1:numel(file_names)
@@ -73,7 +74,7 @@ function [image_file_name, image_file_path] = GetAndSetImageFile(handles)
                 set(handles.listbox1, 'Value', numel(new_listbox_files));
             end
             image_file_name = strcat(path_name, file_name);
-            image_file_path = path_name;
+            image_file_path = strcat(path_name, file_name);
         
         case 'Cancel'
             image_file_name = '';

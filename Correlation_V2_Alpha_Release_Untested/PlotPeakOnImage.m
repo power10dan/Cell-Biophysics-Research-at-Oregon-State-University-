@@ -41,7 +41,8 @@ function PlotPeakOnImage(handles)
         grayimage = original_image;
     end
     %convert alllines to grayscale intensity image
-    alllines = uint8(round(alllines/max(alllines(:))*255)); 
+    alllines = uint8(round(alllines/max(alllines(:))*255));
+    figure,imagesc(alllines);
     % fuse all of the line images to create a final line image which is the
     %new_big_image = imfuse(grayimage,alllines,'blend');
     new_big_image = uint8(zeros([size(grayimage),3]));
@@ -49,4 +50,5 @@ function PlotPeakOnImage(handles)
     new_big_image(:,:,2) = alllines;
     
     figure, imagesc(new_big_image);
+
  end
