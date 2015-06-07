@@ -8,9 +8,9 @@ Conventional image detection software are not sensitive to images with high nois
 ## The Algorithm
 We provide two types of corrlelation analysis: Whole Image and Sub-window Correlation Analysis. 
 Below is the flowchart for the Whole image Correlation Analysis:
-![alt tag](Cell-Biophysics-Research-at-Oregon-State-University-/readme_images/sub_window.png)
-Below is the flowchart that describes the sub-window analysis:
-![alt tag](Cell-Biophysics-Research-at-Oregon-State-University-/readme_images/sub_window.png)
+![correlation_analysis.png](https://github.com/power10dan/Cell-Biophysics-Research-at-Oregon-State-University-/blob/master/readme_images/correlation_analysis.png)
+![sub_window.png](https://github.com/power10dan/Cell-Biophysics-Research-at-Oregon-State-University-/blob/master/readme_images/sub_window.png)
+
 
 
 
