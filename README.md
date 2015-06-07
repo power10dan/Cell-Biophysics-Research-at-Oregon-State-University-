@@ -13,6 +13,15 @@ We provide two types of corrlelation analysis: Whole Image and Sub-window Correl
 <p align="center">
   <img src="https://github.com/power10dan/Cell-Biophysics-Research-at-Oregon-State-University-/blob/master/readme_images/correlation_analysis.png" alt="orrelation_analysis.pn"/>
 </p>
+## Sample Analysis Results
+Below is an image with 10 lines on it. The image has a Gaussian noise variance of 0.2. The image below is the output of our algorithm. The red lines represent the lines on  the original raw imag and the green lines represent lines that are detected by our algorithm. We emphasize that we did not use any noise filters to remove noise from the image. 
+<p align="center">
+<a href="url"><img src="https://github.com/power10dan/Cell-Biophysics-Research-at-Oregon-State-University-/blob/master/readme_images/10_lines.png" height="400" width="450" ></a>
+</p>
+<p align="center">
+  <img src="https://github.com/power10dan/Cell-Biophysics-Research-at-Oregon-State-University-/blob/master/readme_images/line_img_detected.png" alt="10_lines_result"/>
+</p>
+
 
 
 
