@@ -7,8 +7,10 @@ template matching to detect lines on images.
 Conventional image detection software are not sensitive to images with high noise density unless the noise on the images have been removed or filtered by an image noise filter. One example of an image noise filter is a Gaussian noise filter. However, filters can be computationally costly. Some filters can remove details on images. Our method can detect lines on images with high noise density without the need to apply noise filters on images. Additionally, our  algorithm is much simpler compared to other template matching algorithms in OpenCV .  
 ## The Algorithm
 We provide two types of corrlelation analysis: Whole Image and Sub-window Correlation Analysis. 
-Below is the flowchart for the Whole image Correlation Analysis:
 ![correlation_analysis.png](https://github.com/power10dan/Cell-Biophysics-Research-at-Oregon-State-University-/blob/master/readme_images/correlation_analysis.png)
+
+
+
 ![sub_window.png](https://github.com/power10dan/Cell-Biophysics-Research-at-Oregon-State-University-/blob/master/readme_images/sub_window.png)
 
 
